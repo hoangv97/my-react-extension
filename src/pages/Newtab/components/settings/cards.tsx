@@ -1,6 +1,8 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import React from 'react';
 import storage from '@/lib/storage';
+import { Button } from '@/components/ui/button';
+import { set } from 'date-fns';
 
 const CARDS = ['bookmark', 'coin', 'news', 'note'];
 
@@ -49,6 +51,26 @@ const Cards = () => {
             </div>
           );
         })}
+      </div>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setHiddenCards(CARDS);
+          }}
+        >
+          Select all
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setHiddenCards([]);
+          }}
+        >
+          Select none
+        </Button>
       </div>
     </div>
   );
