@@ -26,6 +26,26 @@
     {
       "resources": ["content.styles.css", "icon-128.png", "icon-34.png"],
       "matches": []
+    },
+    {
+      "resources": ["_favicon/*"],
+      "matches": ["<all_urls>"],
+      "extension_ids": ["*"]
     }
+  ],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "bookmarks",
+    "geolocation",
+    "notifications",
+    "topSites",
+    "contextMenus",
+    "cookies",
+    "unlimitedStorage",
+    "scripting",
+    "favicon",
+    "<all_urls>"
   ]
 }
