@@ -16,6 +16,8 @@ const Newtab = () => {
 
   React.useEffect(() => {
     const setupBg = (res: any) => {
+      // shuffle
+      res.sort(() => Math.random() - 0.5);
       setBgImages(
         res
           .map((d: any) => {
@@ -37,7 +39,7 @@ const Newtab = () => {
         const res = await axios.get('https://api.unsplash.com/photos/random', {
           params: {
             client_id: secrets.UNSPLASH_ID,
-            count: 3,
+            count: 5,
             orientation: 'landscape',
           },
         });
