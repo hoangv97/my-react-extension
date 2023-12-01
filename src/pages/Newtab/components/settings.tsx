@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { DashboardIcon } from '@radix-ui/react-icons';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const Settings = () => {
   const [localStorageKeys, setLocalStorageKeys] = React.useState<string[]>([]);
@@ -82,7 +83,7 @@ const Settings = () => {
               );
             })}
           </div>
-          <div className="mb-2 flex gap-2">
+          <div className="mb-3 flex gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -117,6 +118,10 @@ const Settings = () => {
             </Button>
           </div>
           <Separator />
+          <div className="flex items-center gap-3 my-3">
+            <h4 className="text-sm font-medium leading-none">Mode</h4>
+            <ModeToggle />
+          </div>
         </div>
       </SheetContent>
     </Sheet>

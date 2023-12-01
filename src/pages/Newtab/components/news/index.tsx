@@ -122,11 +122,11 @@ const News = () => {
                         href={article.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-gray-700 font-bold mb-2"
+                        className="text-gray-700 dark:text-gray-300 font-bold mb-2"
                       >
                         {article.title}
                       </a>
-                      <div className="text-gray-700 text-sm">
+                      <div className="text-gray-700 dark:text-gray-400 text-sm">
                         {article.description}
                       </div>
                     </div>

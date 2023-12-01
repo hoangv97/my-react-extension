@@ -74,7 +74,7 @@ const Coin = () => {
           {coins.map((coin) => (
             <div
               key={coin.id}
-              className="flex-col items-center justify-center text-center"
+              className="flex-col items-center justify-center text-center text-black dark:text-gray-200"
             >
               <img
                 className="w-6 h-6 mx-auto"

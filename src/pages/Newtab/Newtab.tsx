@@ -7,6 +7,7 @@ import Bookmark from './components/bookmark';
 import Coin from './components/coin';
 import Settings from './components/settings';
 import News from './components/news';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
@@ -46,17 +47,19 @@ const Newtab = () => {
   }, []);
 
   return (
-    <div>
-      <Settings />
-      <div className="w-screen h-screen absolute top-0 left-0 overflow-hidden">
-        <Carousel images={bgImages} imageClassName="h-screen" />
+    <ThemeProvider>
+      <div>
+        <Settings />
+        <div className="w-screen h-screen absolute top-0 left-0 overflow-hidden">
+          <Carousel images={bgImages} imageClassName="h-screen" />
+        </div>
+        <div className="min-w-screen min-h-screen">
+          <Bookmark />
+          <Coin />
+          <News />
+        </div>
       </div>
-      <div className="min-w-screen min-h-screen">
-        <Bookmark />
-        <Coin />
-        <News />
-      </div>
-    </div>
+    </ThemeProvider>
   );
 };
 

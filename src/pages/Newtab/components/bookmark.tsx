@@ -91,7 +91,9 @@ const Bookmark = () => {
         {folders.map((folder) => {
           return (
             <div key={folder.id} className="mb-2">
-              <div className="text-gray-700 font-bold mb-2">{folder.title}</div>
+              <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
+                {folder.title}
+              </div>
               <div className="flex gap-1">
                 {folder.sites.map((site: any) => {
                   return (
@@ -102,7 +104,7 @@ const Bookmark = () => {
                       <a
                         href={site.url}
                         target="_blank"
-                        className="text-sm truncate"
+                        className="text-sm text-black dark:text-gray-200 truncate"
                         rel="noreferrer"
                       >
                         <Avatar className="w-6 h-6 mx-auto">
