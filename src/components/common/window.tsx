@@ -101,7 +101,7 @@ const Window = ({
         style={{ background: getCardBackground() }}
       >
         {children}
-        <div className="absolute right-2 bottom-2 text-white hover:text-black">
+        <div className="absolute right-2 bottom-2 text-white hover:text-black dark:text-black hover:dark:text-white">
           {isFullScreen ? (
             <ExitFullScreenIcon
               className="cursor-pointer"

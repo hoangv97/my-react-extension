@@ -1,20 +1,18 @@
-import React from 'react';
+import { ModeToggle } from '@/components/mode-toggle';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { DashboardIcon } from '@radix-ui/react-icons';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ModeToggle } from '@/components/mode-toggle';
+import React from 'react';
 import LocalStorage from './local-storage';
+import Cards from './cards';
 
 const Settings = () => {
   return (
@@ -40,6 +38,8 @@ const Settings = () => {
           </div>
           <Separator className="my-3" />
           <LocalStorage />
+          <Separator className="my-3" />
+          <Cards />
           <Separator className="my-3" />
         </div>
       </SheetContent>

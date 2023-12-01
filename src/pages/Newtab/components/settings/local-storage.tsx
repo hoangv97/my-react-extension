@@ -17,10 +17,7 @@ const LocalStorage = () => {
     getLocalStorageKeys();
   }, []);
 
-  const handleLocalStorageCheckedChange = (
-    key: string,
-    checked: string | boolean
-  ) => {
+  const handleCheckedChange = (key: string, checked: string | boolean) => {
     if (checked) {
       setSelectedLocalStorageKeys((prev) => [...prev, key]);
     } else {
@@ -38,9 +35,7 @@ const LocalStorage = () => {
               <Checkbox
                 id={key}
                 checked={selectedLocalStorageKeys.includes(key)}
-                onCheckedChange={(checked) =>
-                  handleLocalStorageCheckedChange(key, checked)
-                }
+                onCheckedChange={(checked) => handleCheckedChange(key, checked)}
               />
               <label
                 htmlFor={key}

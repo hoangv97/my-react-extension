@@ -8,9 +8,11 @@ import Coin from './components/coin';
 import Settings from './components/settings';
 import News from './components/news';
 import { ThemeProvider } from '@/components/theme-provider';
+import Note from './components/note';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
+  const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     const setupBg = (res: any) => {
@@ -44,6 +46,8 @@ const Newtab = () => {
       }
     };
     fetchBgImages();
+
+    setHiddenCards(storage.getLocalStorage(storage.KEYS.hiddenCards) || []);
   }, []);
 
   return (
@@ -54,9 +58,10 @@ const Newtab = () => {
           <Carousel images={bgImages} imageClassName="h-screen" />
         </div>
         <div className="min-w-screen min-h-screen">
-          <Bookmark />
-          <Coin />
-          <News />
+          {hiddenCards.includes('bookmark') ? null : <Bookmark />}
+          {hiddenCards.includes('coin') ? null : <Coin />}
+          {hiddenCards.includes('news') ? null : <News />}
+          {hiddenCards.includes('note') ? null : <Note />}
         </div>
       </div>
     </ThemeProvider>

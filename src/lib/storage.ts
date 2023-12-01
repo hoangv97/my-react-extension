@@ -1,12 +1,15 @@
 const storage = {
   KEYS: {
+    hiddenCards: "hiddenCards",
     bgImages: "bgImages",
     cmcListings: "cmcListings",
     newsTopHeadlines: "newsTopHeadlines",
+    noteContent: "noteContent",
 
     bookmarkWindowRndState: "bookmarkWindowRndState",
     coinWindowRndState: "coinWindowRndState",
     newsWindowRndState: "newsWindowRndState",
+    noteWindowRndState: "noteWindowRndState",
   },
   getLocalStorage(key: string, defaultVal = null) {
     let result = JSON.parse(localStorage.getItem(key) || "null");

@@ -59,7 +59,9 @@ const News = () => {
         // console.log(results);
         const newCategories = NEWSAPI_CATEGORIES.map((c, i) => ({
           name: c,
-          articles: results[i].data.articles,
+          articles: results[i].data.articles.filter(
+            (article: any) => article.content !== '[Removed]'
+          ),
         }));
         setCategories(newCategories);
         storage.setLocalStorage(cacheKey, newCategories, cacheTimeout);
