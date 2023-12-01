@@ -100,6 +100,7 @@ const Bookmark = () => {
                     <div
                       key={site.url}
                       className="w-16 text-center overflow-x-hidden hover:font-bold"
+                      title={site.title}
                     >
                       <a
                         href={site.url}
