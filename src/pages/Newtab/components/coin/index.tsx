@@ -65,7 +65,7 @@ const Coin = () => {
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
     >
-      <CardContent className="pt-2">
+      <CardContent className="pt-2 h-full overflow-y-auto">
         <div
           className={`flex w-full ${
             isFullScreen ? 'flex-wrap gap-4' : 'overflow-hidden gap-2'

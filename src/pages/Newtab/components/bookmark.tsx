@@ -87,7 +87,7 @@ const Bookmark = () => {
 
   return (
     <Window {...state} onChangeState={handleChangeState}>
-      <CardContent className="pt-2">
+      <CardContent className="pt-2 h-full overflow-y-auto">
         {folders.map((folder) => {
           return (
             <div key={folder.id} className="mb-2">
