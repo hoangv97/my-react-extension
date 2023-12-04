@@ -47,5 +47,6 @@
     "scripting",
     "favicon",
     "<all_urls>"
-  ]
+  ],
+  "host_permissions": ["<all_urls>"]
 }
