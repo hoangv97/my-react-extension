@@ -14,6 +14,7 @@ interface WindowProps {
   onChangeState?: (state: any) => void;
   onToggleFullScreen?: (isFullScreen: boolean) => void;
   children?: React.ReactNode;
+  subButtons?: React.ReactNode;
 }
 
 const Window = ({
@@ -26,6 +27,7 @@ const Window = ({
   onChangeState,
   onToggleFullScreen,
   children,
+  subButtons,
 }: WindowProps) => {
   const [state, setState] = React.useState({
     x,
@@ -101,7 +103,8 @@ const Window = ({
         style={{ background: getCardBackground() }}
       >
         {children}
-        <div className="absolute right-2 bottom-2 text-white hover:text-black dark:text-black hover:dark:text-white">
+        <div className="absolute right-2 bottom-2 flex gap-2 text-white hover:text-black dark:text-black hover:dark:text-white">
+          {subButtons}
           {isFullScreen ? (
             <ExitFullScreenIcon
               className="cursor-pointer"

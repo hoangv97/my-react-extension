@@ -4,14 +4,19 @@ const storage = {
     bgImages: "bgImages",
     cmcListings: "cmcListings",
     newsTopHeadlines: "newsTopHeadlines",
+    newsDataArticles: "newsDataArticles",
+    newsDataCategories: "newsDataCategories",
+    newsDataLanguages: "newsDataLanguages",
+    newsDataCountries: "newsDataCountries",
     noteContent: "noteContent",
 
     bookmarkWindowRndState: "bookmarkWindowRndState",
     coinWindowRndState: "coinWindowRndState",
     newsWindowRndState: "newsWindowRndState",
+    newsDataWindowRndState: "newsDataWindowRndState",
     noteWindowRndState: "noteWindowRndState",
   },
-  getLocalStorage(key: string, defaultVal = null) {
+  getLocalStorage(key: string, defaultVal: any = null) {
     let result = JSON.parse(localStorage.getItem(key) || "null");
     // console.log(result, key, defaultVal)
     if (!result) return defaultVal;
@@ -35,6 +40,9 @@ const storage = {
       time: new Date(),
     };
     localStorage.setItem(key, JSON.stringify(cacheValue));
+  },
+  removeLocalStorage(key: string) {
+    localStorage.removeItem(key);
   },
 }
 

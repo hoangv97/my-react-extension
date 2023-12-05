@@ -4,7 +4,7 @@ import storage from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import { set } from 'date-fns';
 
-const CARDS = ['bookmark', 'coin', 'news', 'note'];
+const CARDS = ['bookmark', 'coin', 'news', 'note', 'newsData'];
 
 const Cards = () => {
   const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);

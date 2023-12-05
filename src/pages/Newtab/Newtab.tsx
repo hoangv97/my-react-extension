@@ -9,6 +9,7 @@ import Settings from './components/settings';
 import News from './components/news';
 import { ThemeProvider } from '@/components/theme-provider';
 import Note from './components/note';
+import NewsData from './components/newsdata';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
@@ -63,6 +64,7 @@ const Newtab = () => {
           {hiddenCards.includes('bookmark') ? null : <Bookmark />}
           {hiddenCards.includes('coin') ? null : <Coin />}
           {hiddenCards.includes('news') ? null : <News />}
+          {hiddenCards.includes('newsData') ? null : <NewsData />}
           {hiddenCards.includes('note') ? null : <Note />}
         </div>
       </div>
