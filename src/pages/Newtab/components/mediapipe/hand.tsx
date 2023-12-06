@@ -2,45 +2,46 @@ import { Button } from '@/components/ui/button';
 import {
   DrawingUtils,
   FilesetResolver,
-  PoseLandmarker,
+  HandLandmarker,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
 
 const videoHeight = '360px';
 const videoWidth = '480px';
 
-const Pose = () => {
+const Hand = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
 
   const webcamRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const canvasCtxRef = React.useRef<CanvasRenderingContext2D>(null);
   const drawingUtilsRef = React.useRef<DrawingUtils>(null);
-  const poseLandmarkerRef = React.useRef<PoseLandmarker>();
+  const handLandmarkerRef = React.useRef<HandLandmarker>();
   const lastVideoTimeRef = React.useRef<number>(0);
   const webcamRunningRef = React.useRef<boolean>(false);
   const windowRequestAnimationFrameRef = React.useRef<number>(0);
 
   React.useEffect(() => {
-    // Before we can use PoseLandmarker class we must wait for it to finish
+    // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
     // get everything needed to run.
-    const createPoseLandmarker = async () => {
+    const createHandLandmarker = async () => {
       const vision = await FilesetResolver.forVisionTasks(
         'js/@mediapipe/tasks-vision/wasm'
       );
-      poseLandmarkerRef.current = await PoseLandmarker.createFromOptions(
+      handLandmarkerRef.current = await HandLandmarker.createFromOptions(
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',
+          numHands: 4,
         }
       );
     };
-    createPoseLandmarker();
+    createHandLandmarker();
 
     // enable webcam
     // Check if webcam access is supported.
@@ -64,7 +65,7 @@ const Pose = () => {
     if (
       canvasRef.current &&
       webcamRef.current &&
-      poseLandmarkerRef.current &&
+      handLandmarkerRef.current &&
       canvasCtxRef.current &&
       drawingUtilsRef.current
     ) {
@@ -76,30 +77,34 @@ const Pose = () => {
       let startTimeMs = performance.now();
       if (lastVideoTimeRef.current !== webcamRef.current.currentTime) {
         lastVideoTimeRef.current = webcamRef.current.currentTime;
-        poseLandmarkerRef.current.detectForVideo(
+        const results = handLandmarkerRef.current.detectForVideo(
           webcamRef.current,
-          startTimeMs,
-          (result) => {
-            canvasCtxRef.current.save();
-            canvasCtxRef.current.clearRect(
-              0,
-              0,
-              canvasRef.current.width,
-              canvasRef.current.height
-            );
-            for (const landmark of result.landmarks) {
-              drawingUtilsRef.current.drawLandmarks(landmark, {
-                radius: (data) =>
-                  DrawingUtils.lerp(data.from!.z, -0.15, 0.1, 5, 1),
-              });
-              drawingUtilsRef.current.drawConnectors(
-                landmark,
-                PoseLandmarker.POSE_CONNECTIONS
-              );
-            }
-            canvasCtxRef.current.restore();
-          }
+          startTimeMs
         );
+        canvasCtxRef.current.save();
+        canvasCtxRef.current.clearRect(
+          0,
+          0,
+          canvasRef.current.width,
+          canvasRef.current.height
+        );
+        if (results.landmarks) {
+          for (const landmarks of results.landmarks) {
+            drawingUtilsRef.current.drawConnectors(
+              landmarks,
+              HandLandmarker.HAND_CONNECTIONS,
+              {
+                color: '#00FF00',
+                lineWidth: 5,
+              }
+            );
+            drawingUtilsRef.current.drawLandmarks(landmarks, {
+              color: '#FF0000',
+              lineWidth: 2,
+            });
+          }
+        }
+        canvasCtxRef.current.restore();
       }
     }
 
@@ -111,8 +116,8 @@ const Pose = () => {
   };
 
   const enableWebcam = async () => {
-    if (!poseLandmarkerRef.current) {
-      console.log('Wait! poseLandmaker not loaded yet.');
+    if (!handLandmarkerRef.current) {
+      console.log('Wait! handLandmaker not loaded yet.');
       return;
     }
 
@@ -159,4 +164,4 @@ const Pose = () => {
   );
 };
 
-export default Pose;
+export default Hand;

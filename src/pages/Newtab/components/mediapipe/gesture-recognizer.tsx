@@ -1,46 +1,49 @@
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import {
   DrawingUtils,
   FilesetResolver,
-  PoseLandmarker,
+  GestureRecognizer,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
 
 const videoHeight = '360px';
 const videoWidth = '480px';
 
-const Pose = () => {
+const GestureRecognizerContainer = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
+  const [gestureOutput, setGestureOutput] = React.useState<any[]>([]);
 
   const webcamRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const canvasCtxRef = React.useRef<CanvasRenderingContext2D>(null);
   const drawingUtilsRef = React.useRef<DrawingUtils>(null);
-  const poseLandmarkerRef = React.useRef<PoseLandmarker>();
+  const gestureRecognizerRef = React.useRef<GestureRecognizer>();
   const lastVideoTimeRef = React.useRef<number>(0);
   const webcamRunningRef = React.useRef<boolean>(false);
   const windowRequestAnimationFrameRef = React.useRef<number>(0);
 
   React.useEffect(() => {
-    // Before we can use PoseLandmarker class we must wait for it to finish
+    // Before we can use GestureRecognizer class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
     // get everything needed to run.
-    const createPoseLandmarker = async () => {
+    const createGestureRecognizer = async () => {
       const vision = await FilesetResolver.forVisionTasks(
         'js/@mediapipe/tasks-vision/wasm'
       );
-      poseLandmarkerRef.current = await PoseLandmarker.createFromOptions(
+      gestureRecognizerRef.current = await GestureRecognizer.createFromOptions(
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',
+          numHands: 4,
         }
       );
     };
-    createPoseLandmarker();
+    createGestureRecognizer();
 
     // enable webcam
     // Check if webcam access is supported.
@@ -64,7 +67,7 @@ const Pose = () => {
     if (
       canvasRef.current &&
       webcamRef.current &&
-      poseLandmarkerRef.current &&
+      gestureRecognizerRef.current &&
       canvasCtxRef.current &&
       drawingUtilsRef.current
     ) {
@@ -76,30 +79,50 @@ const Pose = () => {
       let startTimeMs = performance.now();
       if (lastVideoTimeRef.current !== webcamRef.current.currentTime) {
         lastVideoTimeRef.current = webcamRef.current.currentTime;
-        poseLandmarkerRef.current.detectForVideo(
+        const results = gestureRecognizerRef.current.recognizeForVideo(
           webcamRef.current,
-          startTimeMs,
-          (result) => {
-            canvasCtxRef.current.save();
-            canvasCtxRef.current.clearRect(
-              0,
-              0,
-              canvasRef.current.width,
-              canvasRef.current.height
-            );
-            for (const landmark of result.landmarks) {
-              drawingUtilsRef.current.drawLandmarks(landmark, {
-                radius: (data) =>
-                  DrawingUtils.lerp(data.from!.z, -0.15, 0.1, 5, 1),
-              });
-              drawingUtilsRef.current.drawConnectors(
-                landmark,
-                PoseLandmarker.POSE_CONNECTIONS
-              );
-            }
-            canvasCtxRef.current.restore();
-          }
+          startTimeMs
         );
+        canvasCtxRef.current.save();
+        canvasCtxRef.current.clearRect(
+          0,
+          0,
+          canvasRef.current.width,
+          canvasRef.current.height
+        );
+        if (results.landmarks) {
+          for (const landmarks of results.landmarks) {
+            drawingUtilsRef.current.drawConnectors(
+              landmarks,
+              GestureRecognizer.HAND_CONNECTIONS,
+              {
+                color: '#00FF00',
+                lineWidth: 5,
+              }
+            );
+            drawingUtilsRef.current.drawLandmarks(landmarks, {
+              color: '#FF0000',
+              lineWidth: 2,
+            });
+          }
+        }
+        canvasCtxRef.current.restore();
+
+        if (results.gestures.length > 0) {
+          setGestureOutput(
+            results.gestures.map((gesture, index) => {
+              return {
+                categoryName: gesture[0].categoryName,
+                categoryScore: parseFloat(
+                  (gesture[0].score * 100) as any
+                ).toFixed(2),
+                handedness: results.handednesses[index][0].displayName,
+              };
+            })
+          );
+        } else {
+          setGestureOutput([]);
+        }
       }
     }
 
@@ -111,8 +134,8 @@ const Pose = () => {
   };
 
   const enableWebcam = async () => {
-    if (!poseLandmarkerRef.current) {
-      console.log('Wait! poseLandmaker not loaded yet.');
+    if (!gestureRecognizerRef.current) {
+      console.log('Wait! gestureRecognizer not loaded yet.');
       return;
     }
 
@@ -154,9 +177,21 @@ const Pose = () => {
           ref={canvasRef}
           className="absolute top-0 left-0 pointer-events-none"
         ></canvas>
+        {gestureOutput.length > 0 && (
+          <div className="flex flex-col gap-2 mt-2">
+            {gestureOutput.map((gesture, index) => (
+              <div key={gesture.categoryScore} className="flex gap-2">
+                <div className="w-52">
+                  [{gesture.handedness}] {gesture.categoryName}
+                </div>
+                <Progress value={gesture.categoryScore} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Pose;
+export default GestureRecognizerContainer;
