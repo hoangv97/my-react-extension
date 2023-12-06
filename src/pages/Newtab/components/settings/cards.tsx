@@ -3,7 +3,15 @@ import React from 'react';
 import storage from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 
-const CARDS = ['bookmark', 'coin', 'news', 'note', 'newsData', 'mediapipe'];
+const CARDS = [
+  'bookmark',
+  'coin',
+  'news',
+  'note',
+  'newsData',
+  'mediapipe',
+  'mindmap',
+];
 
 const Cards = () => {
   const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);

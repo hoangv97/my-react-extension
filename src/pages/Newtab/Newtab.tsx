@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import Note from './components/note';
 import NewsData from './components/newsdata';
 import Mediapipe from './components/mediapipe';
+import MindmapContainer from './components/mindmap';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
@@ -68,6 +69,7 @@ const Newtab = () => {
           {hiddenCards.includes('newsData') ? null : <NewsData />}
           {hiddenCards.includes('note') ? null : <Note />}
           {hiddenCards.includes('mediapipe') ? null : <Mediapipe />}
+          {hiddenCards.includes('mindmap') ? null : <MindmapContainer />}
         </div>
       </div>
     </ThemeProvider>

@@ -16,6 +16,7 @@ const storage = {
     newsDataWindowRndState: "newsDataWindowRndState",
     noteWindowRndState: "noteWindowRndState",
     mediapipeWindowRndState: "mediapipeWindowRndState",
+    reactflowWindowRndState: "reactflowWindowRndState",
   },
   getLocalStorage(key: string, defaultVal: any = null) {
     let result = JSON.parse(localStorage.getItem(key) || "null");
