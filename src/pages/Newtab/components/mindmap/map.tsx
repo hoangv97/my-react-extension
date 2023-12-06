@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   ConnectionLineType,
@@ -15,17 +15,10 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { shallow } from 'zustand/shallow';
 import useStore from '../../store';
-import { RFMindmapState } from '../../store/mindmap';
+import { selector } from '../../store/mindmap';
 import MindMapEdge from './edge';
 import MindMapNode from './node';
-
-const selector = (state: RFMindmapState) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  addChildNode: state.addChildNode,
-});
+import ContextMenu from './context-menu';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -44,6 +37,8 @@ const connectionLineStyle = {
 const defaultEdgeOptions = { style: connectionLineStyle, type: 'mindmap' };
 
 const Mindmap = () => {
+  const [menu, setMenu] = useState<any>(null);
+  const ref = useRef<any>(null);
   const { nodes, edges, onNodesChange, onEdgesChange, addChildNode } = useStore(
     selector,
     shallow
@@ -102,8 +97,32 @@ const Mindmap = () => {
     [getChildNodePosition]
   );
 
+  const onNodeContextMenu = useCallback(
+    (event, node) => {
+      // Prevent native context menu from showing
+      event.preventDefault();
+
+      // Calculate position of the context menu. We want to make sure it
+      // doesn't get positioned off-screen.
+      const pane = ref.current.getBoundingClientRect();
+      setMenu({
+        id: node.id,
+        top: event.clientY < pane.height - 200 && event.clientY,
+        left: event.clientX < pane.width - 200 && event.clientX,
+        right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
+        bottom:
+          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+      });
+    },
+    [setMenu]
+  );
+
+  // Close the context menu if it's open whenever the window is clicked.
+  const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
+
   return (
     <ReactFlow
+      ref={ref}
       nodes={nodes}
       onNodesChange={onNodesChange}
       edges={edges}
@@ -113,12 +132,15 @@ const Mindmap = () => {
       nodeOrigin={nodeOrigin}
       onConnectStart={onConnectStart}
       onConnectEnd={onConnectEnd}
+      onNodeContextMenu={onNodeContextMenu}
+      onPaneClick={onPaneClick}
       connectionLineStyle={connectionLineStyle}
       defaultEdgeOptions={defaultEdgeOptions}
       connectionLineType={ConnectionLineType.Straight}
       fitView
     >
       <Background />
+      {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
       <Controls />
       <Panel position="top-left">Mind Map</Panel>
     </ReactFlow>

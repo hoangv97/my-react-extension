@@ -11,7 +11,7 @@ function MindMapNode({ id, data, selected, ...others }: NodeProps<NodeData>) {
   const updateNodeLabel = useStore((state: any) => state.updateNodeLabel);
 
   React.useEffect(() => {
-    console.log('MindMapNode', data, others);
+    // console.log('MindMapNode', data, others);
   }, [others, data]);
 
   return (

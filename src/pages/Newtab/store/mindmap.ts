@@ -9,19 +9,32 @@ import {
   applyEdgeChanges,
   XYPosition,
 } from 'reactflow';
-import { nanoid } from 'nanoid/non-secure';
+import { nanoid } from 'nanoid';
 
 export type RFMindmapState = {
-  nodes: Node[];
-  edges: Edge[];
-  onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
-  addChildNode: (parentNode: Node, position: XYPosition) => void;
-  updateNodeLabel: (nodeId: string, label: string) => void;
+  mindmapNodes: Node[];
+  mindmapEdges: Edge[];
+  onMindmapNodesChange: OnNodesChange;
+  onMindmapEdgesChange: OnEdgesChange;
+  addMindmapChildNode: (parentNode: Node, position: XYPosition) => void;
+  updateMindmapNodeLabel: (nodeId: string, label: string) => void;
+  deleteMindmapNode: (nodeId: string) => void;
+  addMindmapNode: (node: Node, position: XYPosition) => void;
 };
 
+export const selector = (state: RFMindmapState) => ({
+  nodes: state.mindmapNodes,
+  edges: state.mindmapEdges,
+  onNodesChange: state.onMindmapNodesChange,
+  onEdgesChange: state.onMindmapEdgesChange,
+  addChildNode: state.addMindmapChildNode,
+  updateNodeLabel: state.updateMindmapNodeLabel,
+  deleteNode: state.deleteMindmapNode,
+  addNode: state.addMindmapNode,
+});
+
 export const useMindmapSlice = (set: any, get: any) => ({
-  nodes: [
+  mindmapNodes: [
     {
       id: 'root',
       type: 'mindmap',
@@ -29,18 +42,18 @@ export const useMindmapSlice = (set: any, get: any) => ({
       position: { x: 0, y: 0 },
     },
   ],
-  edges: [],
-  onNodesChange: (changes: NodeChange[]) => {
+  mindmapEdges: [],
+  onMindmapNodesChange: (changes: NodeChange[]) => {
     set({
-      nodes: applyNodeChanges(changes, get().nodes),
+      mindmapNodes: applyNodeChanges(changes, get().mindmapNodes),
     });
   },
-  onEdgesChange: (changes: EdgeChange[]) => {
+  onMindmapEdgesChange: (changes: EdgeChange[]) => {
     set({
-      edges: applyEdgeChanges(changes, get().edges),
+      mindmapEdges: applyEdgeChanges(changes, get().mindmapEdges),
     });
   },
-  addChildNode: (parentNode: Node, position: XYPosition) => {
+  addMindmapChildNode: (parentNode: Node, position: XYPosition) => {
     const newNode = {
       id: nanoid(),
       type: 'mindmap',
@@ -56,13 +69,13 @@ export const useMindmapSlice = (set: any, get: any) => ({
     };
 
     set({
-      nodes: [...get().nodes, newNode],
-      edges: [...get().edges, newEdge],
+      nodes: [...get().mindmapNodes, newNode],
+      edges: [...get().mindmapEdges, newEdge],
     });
   },
-  updateNodeLabel: (nodeId: string, label: string) => {
+  updateMindmapNodeLabel: (nodeId: string, label: string) => {
     set({
-      nodes: get().nodes.map((node) => {
+      mindmapNodes: get().mindmapNodes.map((node: Node) => {
         if (node.id === nodeId) {
           // it's important to create a new object here, to inform React Flow about the changes
           node.data = { ...node.data, label };
@@ -72,4 +85,15 @@ export const useMindmapSlice = (set: any, get: any) => ({
       }),
     });
   },
-});
+  deleteMindmapNode: (nodeId: string) => {
+    set({
+      mindmapNodes: get().mindmapNodes.filter((node: Node) => node.id !== nodeId),
+      mindmapEdges: get().mindmapEdges.filter((edge: Edge) => edge.source !== nodeId && edge.target !== nodeId),
+    });
+  },
+  addMindmapNode: (node: Node, position: XYPosition) => {
+    set({
+      mindmapNodes: [...get().mindmapNodes, { ...node, id: nanoid(), position }],
+    });
+  },
+}) as RFMindmapState;
