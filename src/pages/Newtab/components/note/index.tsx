@@ -1,5 +1,4 @@
 import Window from '@/components/common/window';
-import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import openai from '@/lib/openai';

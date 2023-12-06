@@ -2,9 +2,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import React from 'react';
 import storage from '@/lib/storage';
 import { Button } from '@/components/ui/button';
-import { set } from 'date-fns';
 
-const CARDS = ['bookmark', 'coin', 'news', 'note', 'newsData'];
+const CARDS = ['bookmark', 'coin', 'news', 'note', 'newsData', 'mediapipe'];
 
 const Cards = () => {
   const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);
