@@ -10,7 +10,7 @@ const MindmapContainer = () => {
   const [isFullScreen, setIsFullScreen] = React.useState(false);
 
   React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.reactflowWindowRndState);
+    const state = storage.getLocalStorage(storage.KEYS.mindmapWindowRndState);
     if (state) {
       setState(state);
     } else {
@@ -24,7 +24,7 @@ const MindmapContainer = () => {
   }, []);
 
   const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.reactflowWindowRndState, state);
+    storage.setLocalStorage(storage.KEYS.mindmapWindowRndState, state);
   };
 
   const handleToggleFullScreen = (isFullScreen: boolean) => {

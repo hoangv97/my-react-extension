@@ -9,6 +9,7 @@ const storage = {
     newsDataLanguages: "newsDataLanguages",
     newsDataCountries: "newsDataCountries",
     noteContent: "noteContent",
+    mindmapData: "mindmapData",
 
     bookmarkWindowRndState: "bookmarkWindowRndState",
     coinWindowRndState: "coinWindowRndState",
@@ -16,7 +17,7 @@ const storage = {
     newsDataWindowRndState: "newsDataWindowRndState",
     noteWindowRndState: "noteWindowRndState",
     mediapipeWindowRndState: "mediapipeWindowRndState",
-    reactflowWindowRndState: "reactflowWindowRndState",
+    mindmapWindowRndState: "mindmapWindowRndState",
   },
   getLocalStorage(key: string, defaultVal: any = null) {
     let result = JSON.parse(localStorage.getItem(key) || "null");

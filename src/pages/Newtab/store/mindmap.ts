@@ -20,6 +20,7 @@ export type RFMindmapState = {
   updateMindmapNodeLabel: (nodeId: string, label: string) => void;
   deleteMindmapNode: (nodeId: string) => void;
   addMindmapNode: (node: Node, position: XYPosition) => void;
+  setMindmapData: (nodes: Node[], edges: Edge[]) => void;
 };
 
 export const selector = (state: RFMindmapState) => ({
@@ -31,6 +32,7 @@ export const selector = (state: RFMindmapState) => ({
   updateNodeLabel: state.updateMindmapNodeLabel,
   deleteNode: state.deleteMindmapNode,
   addNode: state.addMindmapNode,
+  setData: state.setMindmapData,
 });
 
 export const useMindmapSlice = (set: any, get: any) => ({
@@ -43,6 +45,12 @@ export const useMindmapSlice = (set: any, get: any) => ({
     },
   ],
   mindmapEdges: [],
+  setMindmapData: (nodes: Node[], edges: Edge[]) => {
+    set({
+      mindmapNodes: nodes,
+      mindmapEdges: edges,
+    });
+  },
   onMindmapNodesChange: (changes: NodeChange[]) => {
     set({
       mindmapNodes: applyNodeChanges(changes, get().mindmapNodes),
@@ -69,8 +77,8 @@ export const useMindmapSlice = (set: any, get: any) => ({
     };
 
     set({
-      nodes: [...get().mindmapNodes, newNode],
-      edges: [...get().mindmapEdges, newEdge],
+      mindmapNodes: [...get().mindmapNodes, newNode],
+      mindmapEdges: [...get().mindmapEdges, newEdge],
     });
   },
   updateMindmapNodeLabel: (nodeId: string, label: string) => {

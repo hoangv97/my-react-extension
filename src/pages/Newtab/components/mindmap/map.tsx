@@ -19,6 +19,7 @@ import { selector } from '../../store/mindmap';
 import MindMapEdge from './edge';
 import MindMapNode from './node';
 import ContextMenu from './context-menu';
+import storage from '@/lib/storage';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -39,14 +40,13 @@ const defaultEdgeOptions = { style: connectionLineStyle, type: 'mindmap' };
 const Mindmap = () => {
   const [menu, setMenu] = useState<any>(null);
   const ref = useRef<any>(null);
-  const { nodes, edges, onNodesChange, onEdgesChange, addChildNode } = useStore(
-    selector,
-    shallow
-  );
+  const { nodes, edges, onNodesChange, onEdgesChange, addChildNode, setData } =
+    useStore(selector, shallow);
   const connectingNodeId = useRef<string | null>(null);
+  const [rfInstance, setRfInstance] = useState<any>(null);
 
   const store = useStoreApi();
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, setViewport } = useReactFlow();
 
   const getChildNodePosition = (event: MouseEvent, parentNode?: Node) => {
     const { domNode } = store.getState();
@@ -120,6 +120,29 @@ const Mindmap = () => {
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const data = rfInstance.toObject();
+      storage.setLocalStorage(storage.KEYS.mindmapData, JSON.stringify(data));
+    }
+  }, [rfInstance]);
+
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = JSON.parse(
+        storage.getLocalStorage(storage.KEYS.mindmapData)
+      );
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setData(flow.nodes || [], flow.edges || []);
+        setViewport({ x, y, zoom });
+      }
+    };
+
+    restoreFlow();
+  }, [setData, setViewport]);
+
   return (
     <ReactFlow
       ref={ref}
@@ -127,6 +150,7 @@ const Mindmap = () => {
       onNodesChange={onNodesChange}
       edges={edges}
       onEdgesChange={onEdgesChange}
+      onInit={setRfInstance}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       nodeOrigin={nodeOrigin}
@@ -142,7 +166,16 @@ const Mindmap = () => {
       <Background />
       {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
       <Controls />
-      <Panel position="top-left">Mind Map</Panel>
+      <Panel position="top-left">
+        <div className="flex gap-2 z-50">
+          <div className="cursor-pointer hover:font-bold" onClick={onSave}>
+            Save
+          </div>
+          <div className="cursor-pointer hover:font-bold" onClick={onRestore}>
+            Restore
+          </div>
+        </div>
+      </Panel>
     </ReactFlow>
   );
 };
