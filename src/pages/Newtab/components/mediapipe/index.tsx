@@ -6,6 +6,8 @@ import React from 'react';
 import GestureRecognizerContainer from './gesture-recognizer';
 import Hand from './hand';
 import Pose from './pose';
+import FaceLandmarkDetection from './face-landmark';
+import ObjectDetectorContainer from './object-detector';
 
 const options = [
   {
@@ -22,6 +24,16 @@ const options = [
     label: 'Gesture Recognizer',
     value: 'gesture-recognizer',
     component: <GestureRecognizerContainer />,
+  },
+  {
+    label: 'Face Landmark Detection',
+    value: 'face-landmark-detection',
+    component: <FaceLandmarkDetection />,
+  },
+  {
+    label: 'Object Detection',
+    value: 'object-detection',
+    component: <ObjectDetectorContainer />,
   },
 ];
 
