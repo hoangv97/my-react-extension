@@ -38,7 +38,9 @@ const Coin = () => {
             },
           }
         );
-        // console.log(res.data);
+        if (res.status !== 200) {
+          return;
+        }
         setCoins(res.data.data);
         storage.setLocalStorage(cacheKey, res.data.data, cacheTimeout);
       }

@@ -47,6 +47,9 @@ const Newtab = () => {
             orientation: 'landscape',
           },
         });
+        if (res.status !== 200) {
+          return;
+        }
         setupBg(res.data);
         storage.setLocalStorage(cacheKey, res.data, cacheTimeout);
       }

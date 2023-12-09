@@ -43,7 +43,7 @@ const Bookmark = () => {
         });
       };
 
-      chrome.bookmarks.getTree((bookmarks) => {
+      chrome.bookmarks?.getTree((bookmarks) => {
         scanTree(bookmarks);
 
         chrome.topSites.get((results) => {

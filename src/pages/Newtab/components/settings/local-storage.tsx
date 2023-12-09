@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import React from 'react';
 
 const LocalStorage = () => {
@@ -28,25 +29,29 @@ const LocalStorage = () => {
   return (
     <div>
       <h4 className="text-sm font-medium leading-none">Clear local storage</h4>
-      <div className="my-2 flex flex-col gap-2">
-        {localStorageKeys.map((key) => {
-          return (
-            <div key={key} className="flex items-center space-x-2">
-              <Checkbox
-                id={key}
-                checked={selectedLocalStorageKeys.includes(key)}
-                onCheckedChange={(checked) => handleCheckedChange(key, checked)}
-              />
-              <label
-                htmlFor={key}
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {key}
-              </label>
-            </div>
-          );
-        })}
-      </div>
+      <ScrollArea className="h-[200px]">
+        <div className="flex flex-col gap-2 my-2">
+          {localStorageKeys.map((key) => {
+            return (
+              <div key={key} className="flex items-center space-x-2">
+                <Checkbox
+                  id={key}
+                  checked={selectedLocalStorageKeys.includes(key)}
+                  onCheckedChange={(checked) =>
+                    handleCheckedChange(key, checked)
+                  }
+                />
+                <label
+                  htmlFor={key}
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {key}
+                </label>
+              </div>
+            );
+          })}
+        </div>
+      </ScrollArea>
       <div className="flex gap-2">
         <Button
           variant="outline"
