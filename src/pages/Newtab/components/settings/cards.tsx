@@ -11,6 +11,7 @@ const CARDS = [
   'newsData',
   'mediapipe',
   'mindmap',
+  'draw',
 ];
 
 const Cards = () => {

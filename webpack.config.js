@@ -129,6 +129,16 @@ var options = {
         ],
         exclude: /node_modules/,
       },
+      {
+        test: /\.m?js/,
+        type: 'javascript/auto',
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
     ],
   },
   resolve: {
