@@ -169,7 +169,12 @@ const WebcamContainer = () => {
       />
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 justify-center items-center">
-          <Button variant={'outline'} size={'icon'} onClick={doOcr}>
+          <Button
+            variant={'outline'}
+            size={'icon'}
+            onClick={doOcr}
+            className="hidden"
+          >
             <CubeIcon />
           </Button>
           <Button variant={'outline'} size={'icon'} onClick={capturePhoto}>
