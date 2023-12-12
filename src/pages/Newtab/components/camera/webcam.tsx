@@ -6,9 +6,11 @@ import {
   DownloadIcon,
   StopIcon,
   VideoIcon,
+  CubeIcon,
 } from '@radix-ui/react-icons';
 import React from 'react';
 import Webcam from 'react-webcam';
+import { recognize } from 'tesseract.js';
 
 const WebcamContainer = () => {
   const webcamRef = React.useRef<Webcam>(null);
@@ -29,6 +31,8 @@ const WebcamContainer = () => {
   const [capturedVideos, setCapturedVideos] = React.useState<any[]>([]);
   const [capturedVideoLength, setCapturedVideoLength] = React.useState(0);
   const capturedVideoLengthIntervalRef = React.useRef<any>();
+
+  const [ocrResult, setOcrResult] = React.useState<any>(null);
 
   const handleDevices = React.useCallback(
     (mediaDevices: MediaDeviceInfo[]) =>
@@ -113,6 +117,18 @@ const WebcamContainer = () => {
     }
   }, [recordedChunks]);
 
+  const doOcr = React.useCallback(() => {
+    if (!webcamRef.current) return;
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (!imageSrc) return;
+    recognize(imageSrc, 'eng', {
+      logger: (m) => console.log(m),
+    }).then(({ data: { text } }) => {
+      console.log(text);
+      setOcrResult(text);
+    });
+  }, [webcamRef]);
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
@@ -153,6 +169,9 @@ const WebcamContainer = () => {
       />
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 justify-center items-center">
+          <Button variant={'outline'} size={'icon'} onClick={doOcr}>
+            <CubeIcon />
+          </Button>
           <Button variant={'outline'} size={'icon'} onClick={capturePhoto}>
             <CameraIcon />
           </Button>

@@ -130,11 +130,11 @@ var options = {
         exclude: /node_modules/,
       },
       {
-        test: /\.m?js/,
+        test: /\.mjs/,
         type: 'javascript/auto',
       },
       {
-        test: /\.m?js/,
+        test: /\.mjs/,
         resolve: {
           fullySpecified: false,
         },
