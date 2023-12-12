@@ -13,7 +13,9 @@ const PoseLandmarkerResultContainer = ({
   result,
 }: PoseLandmarkerResultContainerProps) => {
   const handleMotionDetected = useCallback((event: any) => {
-    console.log('motion detected', event);
+    if (event.length) {
+      console.log('motion detected', event);
+    }
   }, []);
 
   const { setResult, poseLandmarks, angles } =

@@ -19,6 +19,7 @@ const storage = {
     mediapipeWindowRndState: "mediapipeWindowRndState",
     mindmapWindowRndState: "mindmapWindowRndState",
     drawWindowRndState: "drawWindowRndState",
+    cameraWindowRndState: "cameraWindowRndState",
   },
   getLocalStorage(key: string, defaultVal: any = null) {
     let result = JSON.parse(localStorage.getItem(key) || "null");

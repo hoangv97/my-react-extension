@@ -13,6 +13,7 @@ const CARDS = [
   'mediapipe',
   'mindmap',
   'draw',
+  'camera',
 ];
 
 const Cards = () => {

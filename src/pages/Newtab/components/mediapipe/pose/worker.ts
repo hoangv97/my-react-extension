@@ -85,7 +85,7 @@ export const angleList: any[] = [
   },
 ];
 
-const detect = (result: PoseLandmarkerResult, timestamp: number) => {
+export const detect = (result: PoseLandmarkerResult, timestamp: number) => {
   // console.log('detecting', timestamp);
   const events: any[] = [];
 
@@ -134,6 +134,7 @@ const detect = (result: PoseLandmarkerResult, timestamp: number) => {
 /* eslint-disable no-restricted-globals */
 self.onmessage = (e: MessageEvent) => {
   // console.log('Worker received:', e.data);
+  return
   const { result, timestamp } = e.data;
   const detected = detect(result, timestamp);
   self.postMessage(detected);
