@@ -50,8 +50,8 @@ const Mediapipe = () => {
       setState({
         x: 5,
         y: 5,
-        width: 500,
-        height: 400,
+        width: 720,
+        height: 520,
       });
     }
   }, []);

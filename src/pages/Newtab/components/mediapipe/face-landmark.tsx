@@ -6,9 +6,7 @@ import {
   FaceLandmarker,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
-
-const videoHeight = '360px';
-const videoWidth = '480px';
+import { videoHeight, videoWidth } from './utils';
 
 const FaceLandmarkDetection = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
@@ -35,7 +33,7 @@ const FaceLandmarkDetection = () => {
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            modelAssetPath: `models/mediapipe/face_landmarker.task`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',

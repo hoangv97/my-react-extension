@@ -6,9 +6,7 @@ import {
   GestureRecognizer,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
-
-const videoHeight = '360px';
-const videoWidth = '480px';
+import { videoHeight, videoWidth } from './utils';
 
 const GestureRecognizerContainer = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
@@ -35,7 +33,7 @@ const GestureRecognizerContainer = () => {
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task`,
+            modelAssetPath: `models/mediapipe/gesture_recognizer.task`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',

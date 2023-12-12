@@ -5,9 +5,7 @@ import {
   ObjectDetector,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
-
-const videoHeight = '360px';
-const videoWidth = '480px';
+import { videoHeight, videoWidth } from './utils';
 
 const ObjectDetectorContainer = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
@@ -32,7 +30,7 @@ const ObjectDetectorContainer = () => {
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite`,
+            modelAssetPath: `models/mediapipe/efficientdet_lite0.tflite`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',

@@ -5,9 +5,7 @@ import {
   HandLandmarker,
 } from '@mediapipe/tasks-vision';
 import React from 'react';
-
-const videoHeight = '360px';
-const videoWidth = '480px';
+import { videoHeight, videoWidth } from './utils';
 
 const Hand = () => {
   const [isEnableWebcamButton, setIsEnableWebcamButton] = React.useState(false);
@@ -33,7 +31,7 @@ const Hand = () => {
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+            modelAssetPath: `models/mediapipe/hand_landmarker.task`,
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',
