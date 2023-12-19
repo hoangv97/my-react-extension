@@ -2,19 +2,11 @@ import axios from 'axios';
 import secrets from 'secrets';
 
 const openai = {
-  createChatCompletions: async (
-    messages: any[],
-    model = 'gpt-4',
-    temperature?: number,
-    tools?: any[],
-  ) => {
+  createChatCompletions: async (requestBody: any) => {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model,
-        temperature,
-        messages,
-        tools,
+        ...requestBody
       },
       {
         headers: {

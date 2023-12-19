@@ -144,7 +144,9 @@ const Ai = () => {
     ];
     setLoading(true);
     setMessages(newMessages);
-    const response = await openai.createChatCompletions(newMessages);
+    const response = await openai.createChatCompletions({
+      messages: newMessages,
+    });
     setLoading(false);
     setMessages((prev) => [...prev, response.choices[0].message]);
   };

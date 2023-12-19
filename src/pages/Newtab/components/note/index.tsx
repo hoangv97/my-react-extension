@@ -53,7 +53,10 @@ const Note = () => {
         content: note,
       },
     ];
-    const response = await openai.createChatCompletions(messages);
+    const response = await openai.createChatCompletions({
+      messages,
+      model: 'gpt4',
+    });
   };
 
   if (!state) {

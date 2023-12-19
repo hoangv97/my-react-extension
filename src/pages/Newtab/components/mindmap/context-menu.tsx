@@ -19,7 +19,7 @@ export default function ContextMenu({
   ...props
 }: any) {
   const { getNode } = useReactFlow();
-  const { deleteNode, addNode } = useStore(selector, shallow);
+  const { deleteNode, addNode, generateNodes } = useStore(selector, shallow);
 
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
@@ -36,6 +36,10 @@ export default function ContextMenu({
     deleteNode(id);
   }, [id]);
 
+  const onGenerateNodes = useCallback(() => {
+    generateNodes(id);
+  }, [id]);
+
   return (
     <div
       style={{ top, left, right, bottom }}
@@ -45,6 +49,9 @@ export default function ContextMenu({
       <Command className="rounded-lg border shadow-md">
         <CommandList>
           <CommandGroup heading={`Node: ${id}`}>
+            <CommandItem>
+              <div onClick={onGenerateNodes}>Generate</div>
+            </CommandItem>
             <CommandItem>
               <div onClick={duplicateNode}>Duplicate</div>
             </CommandItem>

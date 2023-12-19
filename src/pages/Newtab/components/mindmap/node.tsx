@@ -2,13 +2,15 @@ import { Handle, NodeProps, Position, NodeResizer } from 'reactflow';
 import React from 'react';
 import useStore from '../../store';
 import { Input } from '@/components/ui/input';
+import { selector } from '../../store/mindmap';
+import { shallow } from 'zustand/shallow';
 
 export type NodeData = {
   label: string;
 };
 
 function MindMapNode({ id, data, selected, ...others }: NodeProps<NodeData>) {
-  const updateNodeLabel = useStore((state: any) => state.updateNodeLabel);
+  const { updateNodeLabel } = useStore(selector, shallow);
 
   React.useEffect(() => {
     // console.log('MindMapNode', data, others);

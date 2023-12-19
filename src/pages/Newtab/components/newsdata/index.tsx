@@ -305,7 +305,7 @@ const NewsData = () => {
                             <div
                               className="text-gray-700 dark:text-gray-400 text-sm"
                               dangerouslySetInnerHTML={{
-                                __html: article.description.replaceAll(
+                                __html: article.description?.replaceAll(
                                   '\n',
                                   '<br />'
                                 ),
