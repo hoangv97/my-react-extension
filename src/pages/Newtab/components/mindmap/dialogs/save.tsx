@@ -7,25 +7,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface SaveDialogProps {
   onSave: (state: any) => void;
+  onClose: () => void;
 }
 
-export function SaveDialog({ onSave }: SaveDialogProps) {
+export function SaveDialog({ onSave, onClose }: SaveDialogProps) {
   const [state, setState] = React.useState<any>({
     name: '',
   });
+  const [open, setOpen] = React.useState(true);
+
+  useEffect(() => {
+    if (!open) {
+      onClose();
+    }
+  }, [open]);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <div className="cursor-pointer hover:font-bold">Save</div>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(val) => setOpen(val)}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit file</DialogTitle>
@@ -44,6 +49,7 @@ export function SaveDialog({ onSave }: SaveDialogProps) {
               onChange={(e) =>
                 setState((prev: any) => ({ ...prev, name: e.target.value }))
               }
+              autoComplete="off"
               className="col-span-3"
             />
           </div>

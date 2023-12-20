@@ -10,13 +10,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import storage from '@/lib/storage';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface RestoreDialogProps {
   onRestore: (file: any) => void;
+  onClose: () => void;
 }
 
-export function ListDialog({ onRestore }: RestoreDialogProps) {
+export function ListDialog({ onRestore, onClose }: RestoreDialogProps) {
   const getFiles = () => {
     const files = storage.getLocalStorage(storage.KEYS.mindmapData, []);
     files.sort((a: any, b: any) => {
@@ -25,15 +26,21 @@ export function ListDialog({ onRestore }: RestoreDialogProps) {
     return files;
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [files, setFiles] = React.useState<any[]>(getFiles());
   const [selectedFile, setSelectedFile] = React.useState<any>();
+
+  useEffect(() => {
+    if (!open) {
+      onClose();
+    }
+  }, [open]);
 
   return (
     <Dialog
       open={open}
-      onOpenChange={() => {
-        setOpen(!open);
+      onOpenChange={(val) => {
+        setOpen(val);
         setFiles(getFiles());
       }}
     >

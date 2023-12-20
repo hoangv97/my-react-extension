@@ -1,6 +1,6 @@
 import storage from '@/lib/storage';
 import { nanoid } from 'nanoid';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   ConnectionLineType,
@@ -17,12 +17,29 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { shallow } from 'zustand/shallow';
 import useStore from '../../store';
-import { selector } from '../../store/mindmap';
+import {
+  DEFAULT_ROOT_NODE,
+  LAYOUT_OPTIONS,
+  LOADING_STATUS_MESSAGES,
+  selector,
+} from '../../store/mindmap';
 import ContextMenu from './context-menu';
 import { ListDialog } from './dialogs/list';
 import { SaveDialog } from './dialogs/save';
 import MindMapEdge from './edge';
 import MindMapNode from './node';
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from '@/components/ui/menubar';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -51,12 +68,24 @@ const Mindmap = () => {
     addChildNode,
     setData,
     loadingStatus,
+    selectedLayoutOption,
+    setSelectedLayoutOption,
+    currentFile,
+    setCurrentFile,
   } = useStore(selector, shallow);
   const connectingNodeId = useRef<string | null>(null);
   const [rfInstance, setRfInstance] = useState<any>(null);
+  const [openSaveDialog, setOpenSaveDialog] = useState(false);
+  const [openFileListDialog, setOpenFileListDialog] = useState(false);
 
   const store = useStoreApi();
-  const { screenToFlowPosition, setViewport } = useReactFlow();
+  const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
+
+  useEffect(() => {
+    if (loadingStatus === LOADING_STATUS_MESSAGES.generatingNodes) {
+      fitView();
+    }
+  }, [nodes, edges, loadingStatus]);
 
   const getChildNodePosition = (event: MouseEvent, parentNode?: Node) => {
     const { domNode } = store.getState();
@@ -130,7 +159,7 @@ const Mindmap = () => {
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
-  const onSave = useCallback(
+  const onSaveAsNewFile = useCallback(
     (state: any) => {
       if (rfInstance) {
         const data = rfInstance.toObject();
@@ -143,6 +172,7 @@ const Mindmap = () => {
           name: state.name,
           data: JSON.stringify(data),
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
         storage.setLocalStorage(storage.KEYS.mindmapData, [
           ...mindmapList,
@@ -153,9 +183,27 @@ const Mindmap = () => {
     [rfInstance]
   );
 
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const data = rfInstance.toObject();
+      const mindmapList = storage.getLocalStorage(storage.KEYS.mindmapData, []);
+      const saveFile = {
+        ...currentFile,
+        data: JSON.stringify(data),
+        updatedAt: new Date().toISOString(),
+      };
+      const newFiles = mindmapList.map((file: any) =>
+        file.id === saveFile.id ? saveFile : file
+      );
+      storage.setLocalStorage(storage.KEYS.mindmapData, newFiles);
+      alert(`Saved ${saveFile.name}`);
+    }
+  }, [rfInstance]);
+
   const onRestore = useCallback(
     (file: any) => {
       const restoreFlow = async () => {
+        setCurrentFile(file);
         const flow = JSON.parse(file.data);
 
         if (flow) {
@@ -195,8 +243,68 @@ const Mindmap = () => {
       <Controls />
       <Panel position="top-left">
         <div className="flex gap-2 z-50">
-          <SaveDialog onSave={onSave} />
-          <ListDialog onRestore={onRestore} />
+          <Menubar>
+            <MenubarMenu>
+              <MenubarTrigger>File</MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem
+                  onClick={() => {
+                    setData([DEFAULT_ROOT_NODE], []);
+                    setViewport({ x: 0, y: 0, zoom: 1 });
+                  }}
+                >
+                  New File <MenubarShortcut>⌘N</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem onClick={() => setOpenFileListDialog(true)}>
+                  Files <MenubarShortcut>⌘O</MenubarShortcut>
+                </MenubarItem>
+                {!!currentFile && (
+                  <MenubarItem onClick={onSave}>Save</MenubarItem>
+                )}
+                <MenubarItem onClick={() => setOpenSaveDialog(true)}>
+                  Save as new file <MenubarShortcut>⌘S</MenubarShortcut>
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>Edit</MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem>Find</MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>View</MenubarTrigger>
+              <MenubarContent>
+                <MenubarSub>
+                  <MenubarSubTrigger>Layout Options</MenubarSubTrigger>
+                  <MenubarSubContent>
+                    {LAYOUT_OPTIONS.map((option) => (
+                      <MenubarCheckboxItem
+                        key={option.value}
+                        checked={selectedLayoutOption === option.value}
+                        onClick={() => setSelectedLayoutOption(option.value)}
+                      >
+                        {option.label}
+                      </MenubarCheckboxItem>
+                    ))}
+                  </MenubarSubContent>
+                </MenubarSub>
+                <MenubarItem>Update Layout</MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
+          {openSaveDialog && (
+            <SaveDialog
+              onSave={onSaveAsNewFile}
+              onClose={() => setOpenSaveDialog(false)}
+            />
+          )}
+          {openFileListDialog && (
+            <ListDialog
+              onRestore={onRestore}
+              onClose={() => setOpenFileListDialog(false)}
+            />
+          )}
         </div>
       </Panel>
       <Panel position="top-right">

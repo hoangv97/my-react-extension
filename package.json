@@ -13,6 +13,7 @@
     "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^1.0.4",
     "@hookform/resolvers": "^3.3.2",
     "@mediapipe/tasks-vision": "^0.10.8",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -46,6 +47,7 @@
     "cmdk": "^0.2.0",
     "d3": "^7.8.5",
     "date-fns": "^2.30.0",
+    "elkjs": "^0.8.2",
     "nanoid": "^5.0.4",
     "react": "^18.2.0",
     "react-day-picker": "^8.9.1",
