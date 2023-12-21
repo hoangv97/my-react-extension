@@ -10,11 +10,10 @@ export type NodeData = {
 };
 
 function MindMapNode({ id, data, selected, ...others }: NodeProps<NodeData>) {
-  const { updateNodeLabel } = useStore(selector, shallow);
-
-  React.useEffect(() => {
-    // console.log('MindMapNode', data, others);
-  }, [others, data]);
+  const { updateNodeLabel, selectedNode, setSelectedNode } = useStore(
+    selector,
+    shallow
+  );
 
   return (
     <>
@@ -29,7 +28,14 @@ function MindMapNode({ id, data, selected, ...others }: NodeProps<NodeData>) {
         defaultValue={data.label}
         className="w-full h-full font-sm resize-none focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-offset-0 focus-visible:ring-offset-transparent"
         onChange={(e) => {
-          updateNodeLabel(id, e.target.value);
+          const newLabel = e.target.value;
+          updateNodeLabel(id, newLabel);
+          if (selectedNode) {
+            setSelectedNode({
+              ...selectedNode,
+              data: { ...selectedNode.data, label: newLabel },
+            });
+          }
         }}
       />
 

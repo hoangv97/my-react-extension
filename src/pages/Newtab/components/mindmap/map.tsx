@@ -5,6 +5,7 @@ import ReactFlow, {
   Background,
   ConnectionLineType,
   Controls,
+  MiniMap,
   Node,
   NodeOrigin,
   OnConnectEnd,
@@ -34,12 +35,14 @@ import {
   MenubarContent,
   MenubarItem,
   MenubarMenu,
+  MenubarSeparator,
   MenubarShortcut,
   MenubarSub,
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar';
+import NodeDetail from './node-detail';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -68,10 +71,11 @@ const Mindmap = () => {
     addChildNode,
     setData,
     loadingStatus,
-    selectedLayoutOption,
-    setSelectedLayoutOption,
+    config,
+    setConfig,
     currentFile,
     setCurrentFile,
+    setSelectedNode,
   } = useStore(selector, shallow);
   const connectingNodeId = useRef<string | null>(null);
   const [rfInstance, setRfInstance] = useState<any>(null);
@@ -237,6 +241,9 @@ const Mindmap = () => {
       defaultEdgeOptions={defaultEdgeOptions}
       connectionLineType={ConnectionLineType.Straight}
       fitView
+      onNodeClick={(event, node) => {
+        setSelectedNode(node);
+      }}
     >
       <Background />
       {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
@@ -281,8 +288,8 @@ const Mindmap = () => {
                     {LAYOUT_OPTIONS.map((option) => (
                       <MenubarCheckboxItem
                         key={option.value}
-                        checked={selectedLayoutOption === option.value}
-                        onClick={() => setSelectedLayoutOption(option.value)}
+                        checked={config.layoutOption === option.value}
+                        onClick={() => setConfig('layoutOption', option.value)}
                       >
                         {option.label}
                       </MenubarCheckboxItem>
@@ -290,6 +297,13 @@ const Mindmap = () => {
                   </MenubarSubContent>
                 </MenubarSub>
                 <MenubarItem>Update Layout</MenubarItem>
+                <MenubarSeparator />
+                <MenubarCheckboxItem
+                  checked={config.showMinimap}
+                  onCheckedChange={(val) => setConfig('showMinimap', val)}
+                >
+                  Show Minimap
+                </MenubarCheckboxItem>
               </MenubarContent>
             </MenubarMenu>
           </Menubar>
@@ -310,6 +324,8 @@ const Mindmap = () => {
       <Panel position="top-right">
         <div>{loadingStatus}</div>
       </Panel>
+      {!!config.showMinimap && <MiniMap />}
+      <NodeDetail />
     </ReactFlow>
   );
 };

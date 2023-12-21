@@ -15,12 +15,18 @@ import Dagre from '@dagrejs/dagre';
 import { stratify, tree } from 'd3-hierarchy';
 import ELK, { ElkNode } from 'elkjs/lib/elk.bundled.js';
 
+export type MindmapConfigState = {
+  layoutOption: string;
+  showMinimap: boolean;
+};
+
 export type RFMindmapState = {
   mindmapLoadingStatus?: string;
   mindmapNodes: Node[];
   mindmapEdges: Edge[];
-  mindmapSelectedLayoutOption: string;
+  mindmapConfig: MindmapConfigState;
   mindmapCurrentFile?: any;
+  mindmapSelectedNode?: Node;
   onMindmapNodesChange: OnNodesChange;
   onMindmapEdgesChange: OnEdgesChange;
   addMindmapChildNode: (parentNode: Node, position: XYPosition) => void;
@@ -30,16 +36,18 @@ export type RFMindmapState = {
   setMindmapData: (nodes: Node[], edges: Edge[]) => void;
   generateMindmapNodes: (nodeId: string) => void;
   setMindmapLayout: () => void;
-  setMindmapSelectedLayoutOption: (option: string) => void;
+  setMindmapConfig: (key: string, value: any) => void;
   setMindmapCurrentFile: (file: any) => void;
+  setMindmapSelectedNode: (node: Node) => void;
 };
 
 export const selector = (state: RFMindmapState) => ({
   loadingStatus: state.mindmapLoadingStatus,
   nodes: state.mindmapNodes,
   edges: state.mindmapEdges,
-  selectedLayoutOption: state.mindmapSelectedLayoutOption,
+  config: state.mindmapConfig,
   currentFile: state.mindmapCurrentFile,
+  selectedNode: state.mindmapSelectedNode,
   onNodesChange: state.onMindmapNodesChange,
   onEdgesChange: state.onMindmapEdgesChange,
   addChildNode: state.addMindmapChildNode,
@@ -49,8 +57,9 @@ export const selector = (state: RFMindmapState) => ({
   setData: state.setMindmapData,
   generateNodes: state.generateMindmapNodes,
   setLayout: state.setMindmapLayout,
-  setSelectedLayoutOption: state.setMindmapSelectedLayoutOption,
+  setConfig: state.setMindmapConfig,
   setCurrentFile: state.setMindmapCurrentFile,
+  setSelectedNode: state.setMindmapSelectedNode,
 });
 
 const DEFAULT_ROOT_NAME = 'Enter something...';
@@ -174,12 +183,18 @@ export const useMindmapSlice = (set: any, get: any) => {
   };
 
   return {
+    mindmapConfig: {
+      layoutOption: LAYOUT_OPTIONS[4].value,
+      showMinimap: true,
+    },
     mindmapNodes: [DEFAULT_ROOT_NODE],
     mindmapEdges: [],
-    mindmapSelectedLayoutOption: LAYOUT_OPTIONS[4].value,
-    setMindmapSelectedLayoutOption: (option: string) => {
+    setMindmapConfig: (key: string, value: any) => {
       set({
-        mindmapSelectedLayoutOption: option,
+        mindmapConfig: {
+          ...get().mindmapConfig,
+          [key]: value,
+        },
       });
     },
     setMindmapData: (nodes: Node[], edges: Edge[]) => {
@@ -534,6 +549,11 @@ export const useMindmapSlice = (set: any, get: any) => {
     setMindmapCurrentFile: (file: any) => {
       set({
         mindmapCurrentFile: file,
+      });
+    },
+    setMindmapSelectedNode: (node: Node) => {
+      set({
+        mindmapSelectedNode: node,
       });
     },
   };
