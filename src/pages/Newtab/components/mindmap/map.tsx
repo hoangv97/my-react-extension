@@ -20,7 +20,6 @@ import { shallow } from 'zustand/shallow';
 import useStore from '../../store';
 import {
   DEFAULT_ROOT_NODE,
-  LAYOUT_OPTIONS,
   LOADING_STATUS_MESSAGES,
   selector,
 } from '../../store/mindmap';
@@ -43,6 +42,7 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import NodeDetail from './node-detail';
+import { LAYOUT_OPTIONS } from './lib/layout';
 
 const nodeTypes = {
   mindmap: MindMapNode,

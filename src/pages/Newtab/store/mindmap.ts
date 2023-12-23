@@ -11,9 +11,12 @@ import {
 } from 'reactflow';
 import { nanoid } from 'nanoid';
 import openai from '@/lib/openai';
-import Dagre from '@dagrejs/dagre';
-import { stratify, tree } from 'd3-hierarchy';
-import ELK, { ElkNode } from 'elkjs/lib/elk.bundled.js';
+import {
+  LAYOUT_OPTIONS,
+  updateD3Layout,
+  updateDagreLayout,
+  updateElkLayout,
+} from '../components/mindmap/lib/layout';
 
 export type MindmapConfigState = {
   layoutOption: string;
@@ -76,112 +79,7 @@ export const LOADING_STATUS_MESSAGES = {
   generatingNodes: 'Generating nodes...',
 };
 
-export const LAYOUT_OPTIONS = [
-  {
-    value: 'dagre',
-    label: 'Dagre',
-  },
-  {
-    value: 'd3',
-    label: 'D3',
-  },
-  {
-    value: 'elk_vertical',
-    label: 'Elk Vertical',
-  },
-  {
-    value: 'elk_horizontal',
-    label: 'Elk Horizontal',
-  },
-  {
-    value: 'elk_radial',
-    label: 'Elk Radial',
-  },
-  {
-    value: 'elk_force',
-    label: 'Elk Force',
-  },
-];
-
 export const useMindmapSlice = (set: any, get: any) => {
-  const dagreG = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
-  const updateDagreLayout = (nodes: Node[], edges: Edge[], options: any) => {
-    dagreG.setGraph({ ...options });
-
-    edges.forEach((edge) => dagreG.setEdge(edge.source, edge.target));
-    nodes.forEach((node: any) => dagreG.setNode(node.id, node));
-
-    Dagre.layout(dagreG);
-
-    return {
-      nodes: nodes.map((node) => {
-        const { x, y } = dagreG.node(node.id);
-
-        return { ...node, position: { x, y } };
-      }),
-      edges,
-    };
-  };
-
-  const d3G = tree();
-
-  const updateD3Layout = (nodes: Node[], edges: Edge[], options: any) => {
-    if (nodes.length === 0) return { nodes, edges };
-
-    const { width, height }: any = document
-      .querySelector(`[data-id="${nodes[0].id}"]`)
-      ?.getBoundingClientRect();
-    const hierarchy = stratify()
-      .id((node: any) => node.id)
-      .parentId(
-        (node: any) => edges.find((edge) => edge.target === node.id)?.source
-      );
-    const root = hierarchy(nodes);
-    const layout = d3G.nodeSize([width * 2, height * 2])(root);
-
-    return {
-      nodes: layout.descendants().map((node: any) => ({
-        ...node.data,
-        position: { x: node.x, y: node.y },
-      })),
-      edges,
-    };
-  };
-
-  const elk = new ELK();
-
-  const defaultElkOptions = {
-    'elk.algorithm': 'layered',
-    'elk.layered.spacing.nodeNodeBetweenLayers': 100,
-    'elk.spacing.nodeNode': 80,
-  };
-
-  const updateElkLayout = async (
-    nodes: Node[],
-    edges: Edge[],
-    options: any
-  ) => {
-    const layoutOptions = { ...defaultElkOptions, ...options };
-    const graph: ElkNode = {
-      id: 'root',
-      layoutOptions: layoutOptions,
-      children: nodes as any,
-      edges: edges as any,
-    };
-
-    const { children } = await elk.layout(graph);
-
-    if (children) {
-      // By mutating the children in-place we saves ourselves from creating a
-      // needless copy of the nodes array.
-      nodes.forEach((node: any, index: number) => {
-        node.position = { x: children[index].x, y: children[index].y };
-      });
-    }
-    return { nodes, edges };
-  };
-
   return {
     mindmapConfig: {
       layoutOption: LAYOUT_OPTIONS[4].value,
@@ -324,135 +222,21 @@ export const useMindmapSlice = (set: any, get: any) => {
       set({
         mindmapLoadingStatus: LOADING_STATUS_MESSAGES.callingOpenAI,
       });
-      // const response = await openai.createChatCompletions({
-      //   messages,
-      //   model: 'gpt-4-1106-preview',
-      //   response_format: { type: 'json_object' },
-      //   max_tokens: 550,
-      // });
+      const response = await openai.createChatCompletions({
+        messages,
+        model: 'gpt-4-1106-preview',
+        response_format: { type: 'json_object' },
+        max_tokens: 550,
+      });
 
       set({
         mindmapLoadingStatus: undefined,
       });
 
       try {
-        // const { content } = response.choices[0].message;
-        // const parsedContent = JSON.parse(content);
-        // const { nodes } = parsedContent;
-        const nodes = [
-          {
-            label: 'Understand Your Audience',
-            children: [
-              {
-                label: 'Know Their Interests',
-              },
-              {
-                label: 'Gauge Sensitivity Levels',
-              },
-              {
-                label: 'Adapt to Cultural Nuances',
-              },
-            ],
-          },
-          {
-            label: 'Timing and Rhythm',
-            children: [
-              {
-                label: 'Practice Pause Before Punchline',
-              },
-              {
-                label: 'Maintain a Comfortable Pace',
-              },
-              {
-                label: 'Understand Comic Timing',
-              },
-            ],
-          },
-          {
-            label: 'Use of Language',
-            children: [
-              {
-                label: 'Play With Word Choices',
-              },
-              {
-                label: 'Use Puns and Wordplay',
-              },
-              {
-                label: 'Incorporate Self-Deprecation',
-              },
-            ],
-          },
-          {
-            label: 'Types of Humor',
-            children: [
-              {
-                label: 'Observational Comedy',
-              },
-              {
-                label: 'Satire and Parody',
-              },
-              {
-                label: 'Slapstick and Physical Humor',
-              },
-            ],
-          },
-          {
-            label: 'Learn from Others',
-            children: [
-              {
-                label: 'Watch Stand-up Specials',
-              },
-              {
-                label: 'Study Funny Characters',
-              },
-              {
-                label: 'Participate in Workshops',
-              },
-            ],
-          },
-          {
-            label: 'Practice',
-            children: [
-              {
-                label: 'Write Out Jokes and Stories',
-              },
-              {
-                label: 'Perform in Front of Friends',
-              },
-              {
-                label: 'Try Improv and Open Mics',
-              },
-            ],
-          },
-          {
-            label: 'Body Language and Expression',
-            children: [
-              {
-                label: 'Use Facial Expressions',
-              },
-              {
-                label: 'Employ Gestures',
-              },
-              {
-                label: 'Be Energetic and Expressive',
-              },
-            ],
-          },
-          {
-            label: 'Reading and Reacting',
-            children: [
-              {
-                label: 'Listen to The Audience',
-              },
-              {
-                label: 'Adjust to Feedback',
-              },
-              {
-                label: 'Be Quick to Pivot',
-              },
-            ],
-          },
-        ];
+        const { content } = response.choices[0].message;
+        const parsedContent = JSON.parse(content);
+        const { nodes } = parsedContent;
         console.log('nodes', nodes);
 
         const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
