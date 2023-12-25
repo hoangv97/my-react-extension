@@ -14,6 +14,7 @@ const CARDS = [
   'mindmap',
   'draw',
   'camera',
+  'codeDemo',
 ];
 
 const Cards = () => {

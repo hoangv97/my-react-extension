@@ -1,28 +1,30 @@
 const storage = {
   KEYS: {
-    hiddenCards: "hiddenCards",
-    bgImages: "bgImages",
-    cmcListings: "cmcListings",
-    newsTopHeadlines: "newsTopHeadlines",
-    newsDataArticles: "newsDataArticles",
-    newsDataCategories: "newsDataCategories",
-    newsDataLanguages: "newsDataLanguages",
-    newsDataCountries: "newsDataCountries",
-    noteContent: "noteContent",
-    mindmapData: "mindmapData",
+    hiddenCards: 'hiddenCards',
+    bgImages: 'bgImages',
+    cmcListings: 'cmcListings',
+    newsTopHeadlines: 'newsTopHeadlines',
+    newsDataArticles: 'newsDataArticles',
+    newsDataCategories: 'newsDataCategories',
+    newsDataLanguages: 'newsDataLanguages',
+    newsDataCountries: 'newsDataCountries',
+    noteContent: 'noteContent',
+    mindmapData: 'mindmapData',
+    codeDemoData: 'codeDemoData',
 
-    bookmarkWindowRndState: "bookmarkWindowRndState",
-    coinWindowRndState: "coinWindowRndState",
-    newsWindowRndState: "newsWindowRndState",
-    newsDataWindowRndState: "newsDataWindowRndState",
-    noteWindowRndState: "noteWindowRndState",
-    mediapipeWindowRndState: "mediapipeWindowRndState",
-    mindmapWindowRndState: "mindmapWindowRndState",
-    drawWindowRndState: "drawWindowRndState",
-    cameraWindowRndState: "cameraWindowRndState",
+    bookmarkWindowRndState: 'bookmarkWindowRndState',
+    coinWindowRndState: 'coinWindowRndState',
+    newsWindowRndState: 'newsWindowRndState',
+    newsDataWindowRndState: 'newsDataWindowRndState',
+    noteWindowRndState: 'noteWindowRndState',
+    mediapipeWindowRndState: 'mediapipeWindowRndState',
+    mindmapWindowRndState: 'mindmapWindowRndState',
+    drawWindowRndState: 'drawWindowRndState',
+    cameraWindowRndState: 'cameraWindowRndState',
+    codeDemoWindowRndState: 'codeDemoWindowRndState',
   },
   getLocalStorage(key: string, defaultVal: any = null) {
-    let result = JSON.parse(localStorage.getItem(key) || "null");
+    let result = JSON.parse(localStorage.getItem(key) || 'null');
     // console.log(result, key, defaultVal)
     if (!result) return defaultVal;
     let { value, timeout, time } = result;
@@ -49,6 +51,6 @@ const storage = {
   removeLocalStorage(key: string) {
     localStorage.removeItem(key);
   },
-}
+};
 
-export default storage
+export default storage;

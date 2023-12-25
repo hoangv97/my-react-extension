@@ -14,6 +14,7 @@ import Mediapipe from './components/mediapipe';
 import MindmapContainer from './components/mindmap';
 import Draw from './components/draw';
 import Camera from './components/camera';
+import CodeDemo from './components/codedemo';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
@@ -77,6 +78,7 @@ const Newtab = () => {
           {hiddenCards.includes('mindmap') ? null : <MindmapContainer />}
           {hiddenCards.includes('draw') ? null : <Draw />}
           {hiddenCards.includes('camera') ? null : <Camera />}
+          {hiddenCards.includes('codeDemo') ? null : <CodeDemo />}
         </div>
       </div>
     </ThemeProvider>
