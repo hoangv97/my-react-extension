@@ -21,6 +21,7 @@ interface BodyStateEventProps {
 
 export class Body {
   isVisible: boolean = false;
+  rawLandmarks: NormalizedLandmark[] = [];
   landmarks: PoseLandmarkerProps = {};
   worldLandmarks: PoseLandmarkerProps = {};
   angles: AnglesProps = {};
@@ -95,6 +96,7 @@ export class Body {
       return;
     }
     this.isVisible = true;
+    this.rawLandmarks = landmarks;
     this.landmarks = Object.keys(landmarkMap).reduce(
       (acc: any, key: string) => {
         acc[key] = landmarks[landmarkMap[key]];
