@@ -8,8 +8,20 @@ import Hand from './hand';
 import Pose from './pose';
 import FaceLandmarkDetection from './face-landmark';
 import ObjectDetectorContainer from './object-detector';
+import Actions from './actions';
+import VideoPose from './videoPose';
 
 const options = [
+  {
+    label: 'Video',
+    value: 'video',
+    component: <VideoPose />,
+  },
+  {
+    label: 'Actions',
+    value: 'action',
+    component: <Actions />,
+  },
   {
     label: 'Pose',
     value: 'pose',
