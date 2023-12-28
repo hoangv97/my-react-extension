@@ -48,6 +48,7 @@ export class Body {
   getEventData() {
     return {
       landmarks: this.landmarks,
+      worldLandmarks: this.worldLandmarks,
       angles: this.angles,
     };
   }
@@ -139,14 +140,6 @@ export class Body {
 
     // this.arms.updateLandmarks(this.poseLandmarks, this.angles, timestamp);
     // this.legs.updateLandmarks(this.poseLandmarks, this.angles, timestamp);
-
-    // console.log(this.angles.leftShoulder);
-    // console.log(
-    //   this.worldLandmarks.leftShoulder.z,
-    //   this.worldLandmarks.leftElbow.z,
-    //   this.worldLandmarks.leftWrist.z,
-    //   this.angles.leftElbow
-    // );
 
     this.detectAction(
       'leftJab',

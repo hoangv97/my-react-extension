@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useActionDetection } from './useActionDetection';
 import { videoHeight, videoWidth } from '../utils';
 import { Button } from '@/components/ui/button';
@@ -11,8 +11,14 @@ export default function Actions() {
       console.log(e);
     })
   );
-  const { isEnableWebcamButton, isBodyVisible, enableWebcam } =
+  const { isEnableWebcamButton, isBodyVisible, enableWebcam, disableWebcam } =
     useActionDetection(webcamRef, body);
+
+  useEffect(() => {
+    return () => {
+      disableWebcam();
+    };
+  }, []);
 
   return (
     <div>

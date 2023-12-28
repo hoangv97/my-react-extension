@@ -125,9 +125,15 @@ export const useActionDetection = (
     });
   };
 
+  const disableWebcam = () => {
+    webcamRunningRef.current = false;
+    setIsEnableWebcamButton(true);
+  };
+
   return {
     isEnableWebcamButton,
     isBodyVisible,
     enableWebcam,
+    disableWebcam,
   };
 };
