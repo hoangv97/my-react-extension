@@ -11,16 +11,26 @@ export default function Actions() {
       console.log(e);
     })
   );
-  const { isEnableWebcamButton, enableWebcam } = useActionDetection(
-    webcamRef,
-    body
-  );
+  const { isEnableWebcamButton, isBodyVisible, enableWebcam } =
+    useActionDetection(webcamRef, body);
 
   return (
     <div>
       {isEnableWebcamButton && (
         <Button onClick={enableWebcam} size={'sm'}>
           Enable Webcam
+        </Button>
+      )}
+      {!isEnableWebcamButton && !isBodyVisible && <div>Body not visible</div>}
+      {!isEnableWebcamButton && isBodyVisible && (
+        <Button
+          size="sm"
+          className="my-2"
+          onClick={() => {
+            console.log(body.current);
+          }}
+        >
+          Log body
         </Button>
       )}
       <div className="relative">

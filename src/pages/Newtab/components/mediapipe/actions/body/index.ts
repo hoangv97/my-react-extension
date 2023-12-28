@@ -1,5 +1,10 @@
 import { Landmark, NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { calculateAngle, calculateSlope, coordToList } from '../../utils';
+import {
+  calculate3DAngle,
+  calculateAngle,
+  calculateSlope,
+  coordToList,
+} from '../../utils';
 import {
   AnglesProps,
   PoseLandmarkerProps,
@@ -28,11 +33,15 @@ export class Body {
   arms: Arms;
   legs: Legs;
   state: BodyStateProps = {};
-  eventHandler: (event: BodyStateEventProps) => void;
+  eventHandler?: (event: BodyStateEventProps) => void;
 
-  constructor(eventHandler: (event: BodyStateEventProps) => void) {
+  constructor(eventHandler?: (event: BodyStateEventProps) => void) {
     this.arms = new Arms();
     this.legs = new Legs();
+    this.eventHandler = eventHandler;
+  }
+
+  setEventHandler(eventHandler: (event: BodyStateEventProps) => void) {
     this.eventHandler = eventHandler;
   }
 
@@ -74,11 +83,12 @@ export class Body {
         timestamp - currentState.lastActiveTimestamp > lastActiveTsDiff
       ) {
         this.setState(key, true, timestamp);
-        this.eventHandler({
-          type: key,
-          timestamp,
-          data: this.getEventData(),
-        });
+        this.eventHandler &&
+          this.eventHandler({
+            type: key,
+            timestamp,
+            data: this.getEventData(),
+          });
       }
     } else {
       this.setState(key, false, timestamp);
@@ -119,10 +129,10 @@ export class Body {
         );
         acc[angle.name] = calculateSlope(a, b);
       } else {
-        const [a, b, c] = angle.landmarks.map((landmarkName: string) =>
-          coordToList(landmarks[landmarkMap[landmarkName]])
+        const [a, b, c] = angle.landmarks.map(
+          (landmarkName: string) => worldLandmarks[landmarkMap[landmarkName]]
         );
-        acc[angle.name] = calculateAngle(a, b, c);
+        acc[angle.name] = calculate3DAngle(a, b, c);
       }
       return acc;
     }, {});
@@ -130,6 +140,21 @@ export class Body {
     // this.arms.updateLandmarks(this.poseLandmarks, this.angles, timestamp);
     // this.legs.updateLandmarks(this.poseLandmarks, this.angles, timestamp);
 
-    this.detectAction('leftJab', this.angles.leftElbow > 165, timestamp, 1000);
+    // console.log(this.angles.leftShoulder);
+    // console.log(
+    //   this.worldLandmarks.leftShoulder.z,
+    //   this.worldLandmarks.leftElbow.z,
+    //   this.worldLandmarks.leftWrist.z,
+    //   this.angles.leftElbow
+    // );
+
+    this.detectAction(
+      'leftJab',
+      this.angles.leftElbow > 105 &&
+        this.angles.leftShoulder > 55 &&
+        this.angles.leftShoulder < 90,
+      timestamp,
+      1000
+    );
   }
 }
