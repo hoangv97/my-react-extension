@@ -1,14 +1,16 @@
+import { useTheme } from '@/components/theme-provider';
+import { Button } from '@/components/ui/button';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
+import { css as langCss } from '@codemirror/lang-css';
+import { html as langHtml } from '@codemirror/lang-html';
+import { javascript } from '@codemirror/lang-javascript';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import React, { useEffect, useState } from 'react';
-import { javascript } from '@codemirror/lang-javascript';
-import { html as langHtml } from '@codemirror/lang-html';
-import { css as langCss } from '@codemirror/lang-css';
-import { useTheme } from '@/components/theme-provider';
+import Settings, { SettingsDataProps } from './settings';
 
 export default function CodeEditor() {
   const { theme } = useTheme();
@@ -31,20 +33,41 @@ export default function CodeEditor() {
   const [css, setCss] = useState('');
   const [js, setJs] = useState('');
   const [srcDoc, setSrcDoc] = useState('');
+  const [settings, setSettings] = useState<SettingsDataProps>({
+    html: {
+      className: '',
+      bodyClassName: '',
+      headTags: '',
+    },
+    css: {
+      externalLinks: [''],
+    },
+    js: {
+      externalLinks: [''],
+    },
+  });
+  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSrcDoc(`
-      <html>
-        <style>
-          ${css}
-        </style>
-        <body>
+      <html class="${settings.html.className}">
+        <head>
+          ${settings.html.headTags}
+          ${settings.css.externalLinks
+            .filter((link) => link)
+            .map((link) => `<link rel="stylesheet" href="${link}" />`)
+            .join('')}
+          <style>${css}</style>
+        </head>
+        <body class="${settings.html.bodyClassName}">
           ${html}
+          ${settings.js.externalLinks
+            .filter((link) => link)
+            .map((link) => `<script crossorigin src="${link}"></script>`)
+            .join('')}
+          <script>${js}</script>
         </body>
-        <script>
-          ${js}
-        </script>
       </html>
     `);
     }, 250);
@@ -54,34 +77,71 @@ export default function CodeEditor() {
 
   return (
     <div className="w-full h-full">
-      <ResizablePanelGroup direction="horizontal">
+      <div className="flex justify-end gap-2 mb-2">
+        <Settings
+          data={settings}
+          onChange={(val) => {
+            setSettings(val);
+          }}
+        />
+        <Button
+          size="sm"
+          onClick={() => {
+            setLayout(layout === 'horizontal' ? 'vertical' : 'horizontal');
+          }}
+        >
+          Layout: {layout}
+        </Button>
+      </div>
+      <ResizablePanelGroup direction={layout}>
         <ResizablePanel>
-          <ResizablePanelGroup direction="vertical">
+          <ResizablePanelGroup
+            direction={layout === 'horizontal' ? 'vertical' : 'horizontal'}
+          >
             <ResizablePanel>
-              <ReactCodeMirror
-                value={html}
-                onChange={(val) => setHtml(val)}
-                extensions={[langHtml({})]}
-                theme={themeMode}
-              />
+              <div className="h-full pb-1 pr-1">
+                <div>HTML</div>
+                <ReactCodeMirror
+                  className="h-full"
+                  height="100%"
+                  value={html}
+                  onChange={(val) => setHtml(val)}
+                  extensions={[langHtml({})]}
+                  theme={themeMode}
+                />
+              </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel>
-              <ReactCodeMirror
-                value={css}
-                onChange={(val) => setCss(val)}
-                extensions={[langCss()]}
-                theme={themeMode}
-              />
+              <div className="h-full pb-1 pr-1">
+                <div>CSS</div>
+                <ReactCodeMirror
+                  className="h-full"
+                  height="100%"
+                  value={css}
+                  onChange={(val) => setCss(val)}
+                  extensions={[langCss()]}
+                  theme={themeMode}
+                />
+              </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel>
-              <ReactCodeMirror
-                value={js}
-                onChange={(val) => setJs(val)}
-                extensions={[javascript()]}
-                theme={themeMode}
-              />
+              <div
+                className={`h-full pb-1 ${
+                  layout === 'horizontal' ? 'pr-1' : ''
+                }`}
+              >
+                <div>JS</div>
+                <ReactCodeMirror
+                  className="h-full"
+                  height="100%"
+                  value={js}
+                  onChange={(val) => setJs(val)}
+                  extensions={[javascript()]}
+                  theme={themeMode}
+                />
+              </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
