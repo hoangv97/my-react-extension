@@ -1,15 +1,15 @@
 import Window from '@/components/common/window';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import NotionBookmark from './notion-bookmark';
 import UrlItem from './url-item';
 
 const Bookmark = () => {
   const [folders, setFolders] = React.useState<any[]>([]);
-  const [state, setState] = React.useState<any>();
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.bookmarkWindowRndState);
 
   React.useEffect(() => {
     const getTree = () => {
@@ -65,27 +65,7 @@ const Bookmark = () => {
     };
 
     getTree();
-
-    const state = storage.getLocalStorage(storage.KEYS.bookmarkWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 750,
-        height: 340,
-      });
-    }
   }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.bookmarkWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
 
   if (!state) {
     return null;

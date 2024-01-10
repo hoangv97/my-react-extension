@@ -3,40 +3,21 @@ import { CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import openai from '@/lib/openai';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 
 const Note = () => {
-  const [state, setState] = React.useState<any>();
   const [note, setNote] = React.useState<string>('');
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.noteWindowRndState);
 
   React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.noteWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 200,
-        height: 200,
-      });
-    }
-
     setNote(storage.getLocalStorage(storage.KEYS.noteContent) || '');
   }, []);
 
   React.useEffect(() => {
     storage.setLocalStorage(storage.KEYS.noteContent, note);
   }, [note]);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.noteWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
 
   const ask = async () => {
     console.log(note);

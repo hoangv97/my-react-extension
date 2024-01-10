@@ -1,28 +1,17 @@
 import Window from '@/components/common/window';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import axios from 'axios';
 import React from 'react';
 import secrets from 'secrets';
 
 const Coin = () => {
-  const [state, setState] = React.useState<any>();
   const [coins, setCoins] = React.useState<any[]>([]);
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.coinWindowRndState);
 
   React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.coinWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 750,
-        height: 80,
-      });
-    }
-
     const fetchCoins = async () => {
       const cacheKey = storage.KEYS.cmcListings;
       const cacheTimeout = 1000 * 60 * 60;
@@ -48,14 +37,6 @@ const Coin = () => {
 
     fetchCoins();
   }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.coinWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
 
   if (!state) {
     return null;

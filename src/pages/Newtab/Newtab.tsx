@@ -16,6 +16,49 @@ import Draw from './components/draw';
 import Camera from './components/camera';
 import CodeDemo from './components/codedemo';
 
+const windows = [
+  {
+    key: 'bookmark',
+    component: <Bookmark />,
+  },
+  {
+    key: 'coin',
+    component: <Coin />,
+  },
+  {
+    key: 'news',
+    component: <News />,
+  },
+  {
+    key: 'newsData',
+    component: <NewsData />,
+  },
+  {
+    key: 'note',
+    component: <Note />,
+  },
+  {
+    key: 'mediapipe',
+    component: <Mediapipe />,
+  },
+  {
+    key: 'mindmap',
+    component: <MindmapContainer />,
+  },
+  {
+    key: 'draw',
+    component: <Draw />,
+  },
+  {
+    key: 'camera',
+    component: <Camera />,
+  },
+  {
+    key: 'codeDemo',
+    component: <CodeDemo />,
+  },
+];
+
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
   const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);
@@ -69,16 +112,18 @@ const Newtab = () => {
           <Carousel images={bgImages} imageClassName="h-screen" />
         </div>
         <div className="min-w-screen min-h-screen">
-          {hiddenCards.includes('bookmark') ? null : <Bookmark />}
-          {hiddenCards.includes('coin') ? null : <Coin />}
-          {hiddenCards.includes('news') ? null : <News />}
-          {hiddenCards.includes('newsData') ? null : <NewsData />}
-          {hiddenCards.includes('note') ? null : <Note />}
-          {hiddenCards.includes('mediapipe') ? null : <Mediapipe />}
-          {hiddenCards.includes('mindmap') ? null : <MindmapContainer />}
-          {hiddenCards.includes('draw') ? null : <Draw />}
-          {hiddenCards.includes('camera') ? null : <Camera />}
-          {hiddenCards.includes('codeDemo') ? null : <CodeDemo />}
+          {windows.map((window) => {
+            if (hiddenCards.includes(window.key)) {
+              return null;
+            }
+            // add key prop
+            if (window.component) {
+              window.component = React.cloneElement(window.component, {
+                key: window.key,
+              });
+            }
+            return window.component;
+          })}
         </div>
       </div>
     </ThemeProvider>

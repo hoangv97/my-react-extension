@@ -1,35 +1,14 @@
 import Window from '@/components/common/window';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import 'reactflow/dist/style.css';
 import Mindmap from './map';
 
 const MindmapContainer = () => {
-  const [state, setState] = React.useState<any>();
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
-
-  React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.mindmapWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 500,
-        height: 500,
-      });
-    }
-  }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.mindmapWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.mindmapWindowRndState);
 
   if (!state) {
     return null;

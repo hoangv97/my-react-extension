@@ -2,6 +2,7 @@ import { ComboboxPopover } from '@/components/common/combobox-popover';
 import Window from '@/components/common/window';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import GestureRecognizerContainer from './gesture-recognizer';
 import Hand from './hand';
@@ -50,31 +51,9 @@ const options = [
 ];
 
 const Mediapipe = () => {
-  const [state, setState] = React.useState<any>();
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.mediapipeWindowRndState);
   const [selectedOption, setSelectedOption] = React.useState(options[0].value);
-
-  React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.mediapipeWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 720,
-        height: 520,
-      });
-    }
-  }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.mediapipeWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
 
   if (!state) {
     return null;

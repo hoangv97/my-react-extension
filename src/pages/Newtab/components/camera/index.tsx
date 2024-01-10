@@ -1,34 +1,13 @@
 import Window from '@/components/common/window';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import Webcam from './webcam';
 
 const Camera = () => {
-  const [state, setState] = React.useState<any>();
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
-
-  React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.cameraWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 720,
-        height: 520,
-      });
-    }
-  }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.cameraWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.cameraWindowRndState);
 
   if (!state) {
     return null;

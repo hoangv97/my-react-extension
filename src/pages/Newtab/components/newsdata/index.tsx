@@ -1,20 +1,21 @@
 import Window from '@/components/common/window';
+import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
-import storage from '@/lib/storage';
-import axios from 'axios';
-import React from 'react';
-import secrets from 'secrets';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Checkbox } from '@/components/ui/checkbox';
+import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import { GearIcon } from '@radix-ui/react-icons';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import axios from 'axios';
+import React from 'react';
+import secrets from 'secrets';
 
 const CATEGORIES = [
   'business',
@@ -43,7 +44,9 @@ const cacheKey = storage.KEYS.newsDataArticles;
 const cacheTimeout = 1000 * 60 * 60;
 
 const NewsData = () => {
-  const [state, setState] = React.useState<any>();
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.newsDataWindowRndState);
+
   const [articles, setArticles] = React.useState<any[]>(
     storage.getLocalStorage(storage.KEYS.newsDataArticles, [])
   );
@@ -58,7 +61,6 @@ const NewsData = () => {
   );
   const [showSettings, setShowSettings] = React.useState(false);
   const [nextPage, setNextPage] = React.useState('');
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
 
   const fetchNews = async (page?: string) => {
     let country = countries.length > 0 ? countries.join(',') : undefined;
@@ -81,18 +83,6 @@ const NewsData = () => {
   };
 
   React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.newsDataWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 750,
-        height: 600,
-      });
-    }
-
     const init = async () => {
       const result = storage.getLocalStorage(cacheKey);
       if (result) {
@@ -131,14 +121,6 @@ const NewsData = () => {
       };
       fetchMore();
     }
-  };
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.newsDataWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
   };
 
   const windowSubButtons = () => {

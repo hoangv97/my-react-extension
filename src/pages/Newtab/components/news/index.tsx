@@ -1,11 +1,12 @@
 import Window from '@/components/common/window';
 import { CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import axios from 'axios';
 import React from 'react';
 import secrets from 'secrets';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const NEWSAPI_CATEGORIES = [
   'general',
@@ -20,25 +21,13 @@ const NEWSAPI_COUNTRY = 'us';
 const NEWSAPI_LANGUAGE = 'en';
 
 const News = () => {
-  const [state, setState] = React.useState<any>();
   const [categories, setCategories] = React.useState<any[]>(
     NEWSAPI_CATEGORIES.map((c) => ({ name: c, articles: [] }))
   );
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
+    useWindowState(storage.KEYS.newsWindowRndState);
 
   React.useEffect(() => {
-    const state = storage.getLocalStorage(storage.KEYS.newsWindowRndState);
-    if (state) {
-      setState(state);
-    } else {
-      setState({
-        x: 5,
-        y: 5,
-        width: 750,
-        height: 600,
-      });
-    }
-
     const fetchNews = async () => {
       const cacheKey = storage.KEYS.newsTopHeadlines;
       const cacheTimeout = 1000 * 60 * 60;
@@ -71,14 +60,6 @@ const News = () => {
 
     fetchNews();
   }, []);
-
-  const handleChangeState = (state: any) => {
-    storage.setLocalStorage(storage.KEYS.newsWindowRndState, state);
-  };
-
-  const handleToggleFullScreen = (isFullScreen: boolean) => {
-    setIsFullScreen(isFullScreen);
-  };
 
   if (!state) {
     return null;
