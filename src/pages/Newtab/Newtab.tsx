@@ -1,20 +1,20 @@
 import Carousel from '@/components/common/carousel';
+import { ThemeProvider } from '@/components/theme-provider';
 import storage from '@/lib/storage';
 import axios from 'axios';
 import React from 'react';
 import secrets from 'secrets';
 import Bookmark from './components/bookmark';
-import Coin from './components/coin';
-import Settings from './components/settings';
-import News from './components/news';
-import { ThemeProvider } from '@/components/theme-provider';
-import Note from './components/note';
-import NewsData from './components/newsdata';
-import Mediapipe from './components/mediapipe';
-import MindmapContainer from './components/mindmap';
-import Draw from './components/draw';
 import Camera from './components/camera';
 import CodeDemo from './components/codedemo';
+import Coin from './components/coin';
+import Draw from './components/draw';
+import Mediapipe from './components/mediapipe';
+import MindmapContainer from './components/mindmap';
+import News from './components/news';
+import NewsData from './components/newsdata';
+import Note from './components/note';
+import Settings from './components/settings';
 
 const windows = [
   {
