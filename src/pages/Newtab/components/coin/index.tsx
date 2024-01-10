@@ -59,13 +59,28 @@ const Coin = () => {
               key={coin.id}
               className="flex-col items-center justify-center text-center text-black dark:text-gray-200"
             >
-              <img
-                className="w-6 h-6 mx-auto"
-                src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
-                alt={coin.name}
-              />
-              <div className="text-sm truncate">{coin.name}</div>
-              <div className="text-sm">{coin.quote.USD.price.toFixed(2)}</div>
+              <a
+                href={`https://coinmarketcap.com/currencies/${coin.slug}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  className="w-6 h-6 mx-auto"
+                  src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
+                  alt={coin.name}
+                />
+                <div className="text-sm truncate">{coin.name}</div>
+                <div className="text-sm">{coin.quote.USD.price.toFixed(2)}</div>
+                <div
+                  className={`${
+                    coin.quote.USD.percent_change_24h > 0
+                      ? 'text-green-500 dark:text-green-500'
+                      : 'text-red-500 dark:text-red-500'
+                  } text-xs`}
+                >
+                  {Math.abs(coin.quote.USD.percent_change_24h).toFixed(2)}%
+                </div>
+              </a>
             </div>
           ))}
         </div>
