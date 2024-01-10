@@ -11,6 +11,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import React, { useEffect, useState } from 'react';
 import Settings, { SettingsDataProps } from './settings';
+import SourceCodeDialog from './source-code-dialog';
 
 export default function CodeEditor() {
   const { theme } = useTheme();
@@ -73,11 +74,12 @@ export default function CodeEditor() {
     }, 250);
 
     return () => clearTimeout(timeout);
-  }, [html, css, js]);
+  }, [html, css, js, settings]);
 
   return (
     <div className="w-full h-full">
       <div className="flex justify-end gap-2 mb-2">
+        <SourceCodeDialog srcDoc={srcDoc} />
         <Settings
           data={settings}
           onChange={(val) => {
