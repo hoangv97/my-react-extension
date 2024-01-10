@@ -60,7 +60,11 @@ const connectionLineStyle = {
 };
 const defaultEdgeOptions = { style: connectionLineStyle, type: 'mindmap' };
 
-const Mindmap = () => {
+interface MindmapProps {
+  isFullScreen: boolean;
+}
+
+const Mindmap = ({ isFullScreen }: MindmapProps) => {
   const [menu, setMenu] = useState<any>(null);
   const ref = useRef<any>(null);
   const {
@@ -324,16 +328,16 @@ const Mindmap = () => {
       <Panel position="top-right">
         <div>{loadingStatus}</div>
       </Panel>
-      {!!config.showMinimap && <MiniMap />}
+      {!!config.showMinimap && isFullScreen && <MiniMap />}
       <NodeDetail />
     </ReactFlow>
   );
 };
 
-export default () => {
+export default ({ isFullScreen }: MindmapProps) => {
   return (
     <ReactFlowProvider>
-      <Mindmap />
+      <Mindmap isFullScreen={isFullScreen} />
     </ReactFlowProvider>
   );
 };

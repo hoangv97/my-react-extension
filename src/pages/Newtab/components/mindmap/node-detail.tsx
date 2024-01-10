@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { ArrowUpRightSquareIcon } from 'lucide-react';
 import { Editor } from 'novel';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Panel } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 import useStore from '../../store';

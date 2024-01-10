@@ -22,7 +22,7 @@ const MindmapContainer = () => {
       cardOpacity={0.85}
     >
       <CardContent className="pt-2 h-full overflow-y-auto">
-        <Mindmap />
+        <Mindmap isFullScreen={isFullScreen} />
       </CardContent>
     </Window>
   );
