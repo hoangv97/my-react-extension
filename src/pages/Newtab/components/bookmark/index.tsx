@@ -3,11 +3,13 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
 import React from 'react';
+import NotionBookmark from './notion-bookmark';
+import UrlItem from './url-item';
 
 const Bookmark = () => {
   const [folders, setFolders] = React.useState<any[]>([]);
-
   const [state, setState] = React.useState<any>();
+  const [isFullScreen, setIsFullScreen] = React.useState(false);
 
   React.useEffect(() => {
     const getTree = () => {
@@ -81,52 +83,44 @@ const Bookmark = () => {
     storage.setLocalStorage(storage.KEYS.bookmarkWindowRndState, state);
   };
 
+  const handleToggleFullScreen = (isFullScreen: boolean) => {
+    setIsFullScreen(isFullScreen);
+  };
+
   if (!state) {
     return null;
   }
 
   return (
-    <Window {...state} onChangeState={handleChangeState}>
+    <Window
+      {...state}
+      onChangeState={handleChangeState}
+      onToggleFullScreen={handleToggleFullScreen}
+    >
       <CardContent className="pt-2 h-full overflow-y-auto">
-        {folders.map((folder) => {
-          return (
-            <div key={folder.id} className="mb-2">
-              <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
-                {folder.title}
+        <div>
+          {folders.map((folder) => {
+            return (
+              <div key={folder.id} className="mb-2">
+                <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
+                  {folder.title}
+                </div>
+                <div className="flex gap-1">
+                  {folder.sites.map((site: any) => {
+                    return (
+                      <UrlItem
+                        key={site.url}
+                        url={site.url}
+                        title={site.title}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex gap-1">
-                {folder.sites.map((site: any) => {
-                  return (
-                    <div
-                      key={site.url}
-                      className="w-16 text-center overflow-x-hidden hover:font-bold"
-                      title={site.title}
-                    >
-                      <a
-                        href={site.url}
-                        target="_blank"
-                        className="text-sm text-black dark:text-gray-200 truncate"
-                        rel="noreferrer"
-                      >
-                        <Avatar className="w-6 h-6 mx-auto">
-                          <AvatarImage
-                            src={`chrome-extension://${
-                              chrome.runtime.id
-                            }/_favicon/?pageUrl=${encodeURIComponent(
-                              site.url
-                            )}&size=32`}
-                            alt=""
-                          />
-                        </Avatar>
-                        {site.title}
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        {isFullScreen && <NotionBookmark />}
       </CardContent>
     </Window>
   );
