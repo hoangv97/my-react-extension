@@ -1,6 +1,6 @@
 const storage = {
   KEYS: {
-    activeWindowKeys: 'activeWindowKeys',
+    windows: 'windows',
     bgImages: 'bgImages',
     cmcListings: 'cmcListings',
     newsTopHeadlines: 'newsTopHeadlines',

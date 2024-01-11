@@ -1,6 +1,5 @@
 import Window from '@/components/common/window';
 import { Input } from '@/components/ui/input';
-import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React, { useState } from 'react';
 

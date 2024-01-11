@@ -1,5 +1,4 @@
 import Window from '@/components/common/window';
-import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import 'reactflow/dist/style.css';

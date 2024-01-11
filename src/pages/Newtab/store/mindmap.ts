@@ -85,7 +85,7 @@ export const useMindmapSlice = (set: any, get: any) => {
       layoutOption: LAYOUT_OPTIONS[4].value,
       showMinimap: true,
     },
-    mindmapNodes: [DEFAULT_ROOT_NODE],
+    mindmapNodes: [],
     mindmapEdges: [],
     setMindmapConfig: (key: string, value: any) => {
       set({

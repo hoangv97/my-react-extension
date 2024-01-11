@@ -73,6 +73,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
     onNodesChange,
     onEdgesChange,
     addChildNode,
+    addNode,
     setData,
     loadingStatus,
     config,
@@ -260,7 +261,8 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
               <MenubarContent>
                 <MenubarItem
                   onClick={() => {
-                    setData([DEFAULT_ROOT_NODE], []);
+                    // TODO: if there is unsaved changes, ask user to save
+                    setData([], []);
                     setViewport({ x: 0, y: 0, zoom: 1 });
                   }}
                 >
@@ -272,14 +274,31 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                 {!!currentFile && (
                   <MenubarItem onClick={onSave}>Save</MenubarItem>
                 )}
+                <MenubarItem
+                  onClick={() => {
+                    // TODO
+                  }}
+                >
+                  Save<MenubarShortcut>⌘S</MenubarShortcut>
+                </MenubarItem>
                 <MenubarItem onClick={() => setOpenSaveDialog(true)}>
-                  Save as new file <MenubarShortcut>⌘S</MenubarShortcut>
+                  Save as new file
                 </MenubarItem>
               </MenubarContent>
             </MenubarMenu>
             <MenubarMenu>
               <MenubarTrigger>Edit</MenubarTrigger>
               <MenubarContent>
+                <MenubarItem
+                  onClick={() => {
+                    addNode(
+                      { ...DEFAULT_ROOT_NODE, id: nanoid() },
+                      { x: 0, y: 0 }
+                    );
+                  }}
+                >
+                  Add node
+                </MenubarItem>
                 <MenubarItem>Find</MenubarItem>
               </MenubarContent>
             </MenubarMenu>

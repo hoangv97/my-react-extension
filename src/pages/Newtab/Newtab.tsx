@@ -25,7 +25,6 @@ const Newtab = () => {
           {windowList
             .filter(({ active }) => active)
             .map((window) => {
-              // add key prop to react node to avoid react warning
               return <Fragment key={window.key}>{window.component}</Fragment>;
             })}
         </div>

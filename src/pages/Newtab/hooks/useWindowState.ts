@@ -54,7 +54,10 @@ export const useWindowState = (
   const [state, setState] = useState<any>();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const { width, height } = useWindowSize();
-  const { setActiveWindow } = useStore(selector, shallow);
+  const { windowList, setActiveWindow, setTopWindow } = useStore(
+    selector,
+    shallow
+  );
 
   useEffect(() => {
     const storageState = storage.getLocalStorage(key + storageKeyPostFix);
@@ -74,7 +77,17 @@ export const useWindowState = (
         )
       );
     }
-  }, [width, height]);
+  }, [width, height, defaultState, key]);
+
+  useEffect(() => {
+    const window = windowList.find((window) => window.key === key);
+    if (window) {
+      setState((prev: any) => ({
+        ...prev,
+        zIndex: window.zIndex,
+      }));
+    }
+  }, [windowList, key]);
 
   const handleChangeState = useCallback(
     (state: any) => {
@@ -92,6 +105,8 @@ export const useWindowState = (
         key + storageKeyPostFix,
         stateToStorage(state, width, height)
       );
+
+      setTopWindow(key);
     },
     [key, width, height]
   );

@@ -13,7 +13,7 @@ interface WindowProps {
   y: number;
   width: number | string;
   height: number | string;
-  cardClassName?: string;
+  zIndex?: number;
   cardOpacity?: number;
   children?: React.ReactNode;
   subButtons?: React.ReactNode;
@@ -27,7 +27,7 @@ const Window = ({
   y,
   width,
   height,
-  cardClassName,
+  zIndex,
   cardOpacity,
   children,
   subButtons,
@@ -103,9 +103,10 @@ const Window = ({
           ...position,
         });
       }}
+      style={{ zIndex: zIndex }}
     >
       <Card
-        className={`w-full h-full ${cardClassName || ''}`}
+        className="w-full h-full shadow-xl"
         style={{ background: getCardBackground() }}
       >
         <CardContent className="pt-2 h-full overflow-y-auto">

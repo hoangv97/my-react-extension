@@ -20,6 +20,7 @@ const Cards = () => {
             .map((window) => {
               return (
                 <Button
+                  key={window.key}
                   variant={'ghost'}
                   size={'sm'}
                   onClick={() => {
