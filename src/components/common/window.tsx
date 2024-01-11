@@ -124,10 +124,12 @@ const Window = ({
               onClick={toggleFullScreen}
             />
           )}
-          <Cross1Icon
-            className="cursor-pointer hover:text-red-500"
-            onClick={onClose}
-          />
+          {!isFullScreen && (
+            <Cross1Icon
+              className="cursor-pointer hover:text-red-500"
+              onClick={onClose}
+            />
+          )}
         </div>
       </Card>
     </Rnd>
