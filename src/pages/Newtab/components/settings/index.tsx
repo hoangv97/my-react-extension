@@ -14,7 +14,11 @@ import React from 'react';
 import LocalStorage from './local-storage';
 import Windows from './windows';
 
-const Settings = () => {
+interface SettingsProps {
+  toggleFullscreen: () => void;
+}
+
+const Settings = ({ toggleFullscreen }: SettingsProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -33,8 +37,18 @@ const Settings = () => {
         </SheetHeader>
         <div className="py-4">
           <div className="flex items-center gap-3">
-            <h4 className="text-sm font-medium leading-none">Mode</h4>
-            <ModeToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleFullscreen}
+              className="text-sm"
+            >
+              Fullscreen
+            </Button>
+            <div className="flex items-center gap-3">
+              <h4 className="text-sm font-medium leading-none">Mode</h4>
+              <ModeToggle />
+            </div>
           </div>
           <Separator className="my-3" />
           <Windows />
