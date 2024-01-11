@@ -77,7 +77,7 @@ export default function CodeEditor() {
   }, [html, css, js, settings]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-[calc(100%_-_40px)]">
       <div className="flex justify-end gap-2 mb-2">
         <SourceCodeDialog srcDoc={srcDoc} />
         <Settings

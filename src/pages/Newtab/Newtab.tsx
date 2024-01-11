@@ -2,66 +2,17 @@ import Carousel from '@/components/common/carousel';
 import { ThemeProvider } from '@/components/theme-provider';
 import storage from '@/lib/storage';
 import axios from 'axios';
-import React from 'react';
+import React, { Fragment } from 'react';
 import secrets from 'secrets';
-import Bookmark from './components/bookmark';
-import Camera from './components/camera';
-import CodeDemo from './components/codedemo';
-import Coin from './components/coin';
-import Draw from './components/draw';
-import Mediapipe from './components/mediapipe';
-import MindmapContainer from './components/mindmap';
-import News from './components/news';
-import NewsData from './components/newsdata';
-import Note from './components/note';
+import { shallow } from 'zustand/shallow';
 import Settings from './components/settings';
-
-const windows = [
-  {
-    key: 'bookmark',
-    component: <Bookmark />,
-  },
-  {
-    key: 'coin',
-    component: <Coin />,
-  },
-  {
-    key: 'news',
-    component: <News />,
-  },
-  {
-    key: 'newsData',
-    component: <NewsData />,
-  },
-  {
-    key: 'note',
-    component: <Note />,
-  },
-  {
-    key: 'mediapipe',
-    component: <Mediapipe />,
-  },
-  {
-    key: 'mindmap',
-    component: <MindmapContainer />,
-  },
-  {
-    key: 'draw',
-    component: <Draw />,
-  },
-  {
-    key: 'camera',
-    component: <Camera />,
-  },
-  {
-    key: 'codeDemo',
-    component: <CodeDemo />,
-  },
-];
+import useStore from './store';
+import { selector } from './store/window';
 
 const Newtab = () => {
   const [bgImages, setBgImages] = React.useState<string[]>([]);
-  const [hiddenCards, setHiddenCards] = React.useState<string[]>([]);
+
+  const { windowList } = useStore(selector, shallow);
 
   React.useEffect(() => {
     const setupBg = (res: any) => {
@@ -100,8 +51,6 @@ const Newtab = () => {
       }
     };
     fetchBgImages();
-
-    setHiddenCards(storage.getLocalStorage(storage.KEYS.hiddenCards) || []);
   }, []);
 
   return (
@@ -112,18 +61,12 @@ const Newtab = () => {
           <Carousel images={bgImages} imageClassName="h-screen" />
         </div>
         <div className="min-w-screen min-h-screen">
-          {windows.map((window) => {
-            if (hiddenCards.includes(window.key)) {
-              return null;
-            }
-            // add key prop
-            if (window.component) {
-              window.component = React.cloneElement(window.component, {
-                key: window.key,
-              });
-            }
-            return window.component;
-          })}
+          {windowList
+            .filter(({ active }) => active)
+            .map((window) => {
+              // add key prop to react node to avoid react warning
+              return <Fragment key={window.key}>{window.component}</Fragment>;
+            })}
         </div>
       </div>
     </ThemeProvider>

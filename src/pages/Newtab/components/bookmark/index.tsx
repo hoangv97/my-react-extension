@@ -1,6 +1,4 @@
 import Window from '@/components/common/window';
-import { CardContent } from '@/components/ui/card';
-import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
 import NotionBookmark from './notion-bookmark';
@@ -8,8 +6,13 @@ import UrlItem from './url-item';
 
 const Bookmark = () => {
   const [folders, setFolders] = React.useState<any[]>([]);
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.bookmarkWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('bookmark');
 
   React.useEffect(() => {
     const getTree = () => {
@@ -76,32 +79,27 @@ const Bookmark = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
     >
-      <CardContent className="pt-2 h-full overflow-y-auto">
-        <div>
-          {folders.map((folder) => {
-            return (
-              <div key={folder.id} className="mb-2">
-                <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
-                  {folder.title}
-                </div>
-                <div className="flex gap-1">
-                  {folder.sites.map((site: any) => {
-                    return (
-                      <UrlItem
-                        key={site.url}
-                        url={site.url}
-                        title={site.title}
-                      />
-                    );
-                  })}
-                </div>
+      <div>
+        {folders.map((folder) => {
+          return (
+            <div key={folder.id} className="mb-2">
+              <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
+                {folder.title}
               </div>
-            );
-          })}
-        </div>
-        {isFullScreen && <NotionBookmark />}
-      </CardContent>
+              <div className="flex gap-1">
+                {folder.sites.map((site: any) => {
+                  return (
+                    <UrlItem key={site.url} url={site.url} title={site.title} />
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {isFullScreen && <NotionBookmark />}
     </Window>
   );
 };

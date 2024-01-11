@@ -1,5 +1,4 @@
 import Window from '@/components/common/window';
-import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import axios from 'axios';
@@ -8,8 +7,13 @@ import secrets from 'secrets';
 
 const Coin = () => {
   const [coins, setCoins] = React.useState<any[]>([]);
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.coinWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('coin');
 
   React.useEffect(() => {
     const fetchCoins = async () => {
@@ -47,44 +51,43 @@ const Coin = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
     >
-      <CardContent className="pt-2 h-full overflow-y-auto">
-        <div
-          className={`flex w-full ${
-            isFullScreen ? 'flex-wrap gap-4' : 'overflow-hidden gap-2'
-          }`}
-        >
-          {coins.map((coin) => (
-            <div
-              key={coin.id}
-              className="flex-col items-center justify-center text-center text-black dark:text-gray-200"
+      <div
+        className={`flex w-full ${
+          isFullScreen ? 'flex-wrap gap-4' : 'overflow-hidden gap-2'
+        }`}
+      >
+        {coins.map((coin) => (
+          <div
+            key={coin.id}
+            className="flex-col items-center justify-center text-center text-black dark:text-gray-200"
+          >
+            <a
+              href={`https://coinmarketcap.com/currencies/${coin.slug}`}
+              target="_blank"
+              rel="noreferrer"
             >
-              <a
-                href={`https://coinmarketcap.com/currencies/${coin.slug}`}
-                target="_blank"
-                rel="noreferrer"
+              <img
+                className="w-6 h-6 mx-auto"
+                src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
+                alt={coin.name}
+              />
+              <div className="text-sm truncate">{coin.name}</div>
+              <div className="text-sm">{coin.quote.USD.price.toFixed(2)}</div>
+              <div
+                className={`${
+                  coin.quote.USD.percent_change_24h > 0
+                    ? 'text-green-500 dark:text-green-500'
+                    : 'text-red-500 dark:text-red-500'
+                } text-xs`}
               >
-                <img
-                  className="w-6 h-6 mx-auto"
-                  src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
-                  alt={coin.name}
-                />
-                <div className="text-sm truncate">{coin.name}</div>
-                <div className="text-sm">{coin.quote.USD.price.toFixed(2)}</div>
-                <div
-                  className={`${
-                    coin.quote.USD.percent_change_24h > 0
-                      ? 'text-green-500 dark:text-green-500'
-                      : 'text-red-500 dark:text-red-500'
-                  } text-xs`}
-                >
-                  {Math.abs(coin.quote.USD.percent_change_24h).toFixed(2)}%
-                </div>
-              </a>
-            </div>
-          ))}
-        </div>
-      </CardContent>
+                {Math.abs(coin.quote.USD.percent_change_24h).toFixed(2)}%
+              </div>
+            </a>
+          </div>
+        ))}
+      </div>
     </Window>
   );
 };

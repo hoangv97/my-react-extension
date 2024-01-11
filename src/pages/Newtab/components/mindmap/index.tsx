@@ -1,5 +1,4 @@
 import Window from '@/components/common/window';
-import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
@@ -7,8 +6,13 @@ import 'reactflow/dist/style.css';
 import Mindmap from './map';
 
 const MindmapContainer = () => {
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.mindmapWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('mindmap');
 
   if (!state) {
     return null;
@@ -19,11 +23,10 @@ const MindmapContainer = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
       cardOpacity={0.85}
     >
-      <CardContent className="pt-2 h-full overflow-y-auto">
-        <Mindmap isFullScreen={isFullScreen} />
-      </CardContent>
+      <Mindmap isFullScreen={isFullScreen} />
     </Window>
   );
 };

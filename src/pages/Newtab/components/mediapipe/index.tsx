@@ -1,15 +1,14 @@
 import { ComboboxPopover } from '@/components/common/combobox-popover';
 import Window from '@/components/common/window';
-import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import React from 'react';
+import Actions from './actions';
+import FaceLandmarkDetection from './face-landmark';
 import GestureRecognizerContainer from './gesture-recognizer';
 import Hand from './hand';
-import Pose from './pose';
-import FaceLandmarkDetection from './face-landmark';
 import ObjectDetectorContainer from './object-detector';
-import Actions from './actions';
+import Pose from './pose';
 import VideoPose from './videoPose';
 
 const options = [
@@ -51,8 +50,13 @@ const options = [
 ];
 
 const Mediapipe = () => {
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.mediapipeWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('mediapipe');
   const [selectedOption, setSelectedOption] = React.useState(options[0].value);
 
   if (!state) {
@@ -64,20 +68,19 @@ const Mediapipe = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
       cardOpacity={0.85}
     >
-      <CardContent className="pt-2 h-full overflow-y-auto">
-        <div>
-          <ComboboxPopover
-            value={selectedOption}
-            options={options}
-            onChange={(val) => setSelectedOption(val)}
-          />
-        </div>
-        <div className="mt-2">
-          {options.find((option) => option.value === selectedOption)?.component}
-        </div>
-      </CardContent>
+      <div>
+        <ComboboxPopover
+          value={selectedOption}
+          options={options}
+          onChange={(val) => setSelectedOption(val)}
+        />
+      </div>
+      <div className="mt-2">
+        {options.find((option) => option.value === selectedOption)?.component}
+      </div>
     </Window>
   );
 };

@@ -1,6 +1,5 @@
 import Window from '@/components/common/window';
 import { Button } from '@/components/ui/button';
-import { CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -44,8 +43,13 @@ const cacheKey = storage.KEYS.newsDataArticles;
 const cacheTimeout = 1000 * 60 * 60;
 
 const NewsData = () => {
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.newsDataWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('newsData');
 
   const [articles, setArticles] = React.useState<any[]>(
     storage.getLocalStorage(storage.KEYS.newsDataArticles, [])
@@ -143,170 +147,169 @@ const NewsData = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
       cardOpacity={0.85}
       subButtons={windowSubButtons()}
     >
-      <CardContent className="pt-2 h-full">
-        <ScrollArea className="h-full" onScroll={handleScroll}>
-          <div className={`flex flex-col gap-2`}>
-            {showSettings && (
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-4 items-center">
-                  <div className="text-lg font-bold">Categories</div>
-                  <div className="flex flex-wrap gap-3">
-                    {CATEGORIES.map((item) => (
-                      <div key={item} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={item}
-                          checked={categories.includes(item)}
-                          onCheckedChange={(checked) => {
-                            if (checked && categories.length < maxSelected) {
-                              setCategories((prev) => [...prev, item]);
-                            } else {
-                              setCategories((prev) =>
-                                prev.filter((c) => c !== item)
-                              );
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor={item}
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {item}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-4 items-center">
-                  <div className="text-lg font-bold">Countries</div>
-                  <div className="flex flex-wrap gap-3">
-                    {COUNTRIES.map((item) => (
-                      <div key={item} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={item}
-                          checked={countries.includes(item)}
-                          onCheckedChange={(checked) => {
-                            if (checked && countries.length < maxSelected) {
-                              setCountries((prev) => [...prev, item]);
-                            } else {
-                              setCountries((prev) =>
-                                prev.filter((c) => c !== item)
-                              );
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor={item}
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {item}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-4 items-center">
-                  <div className="text-lg font-bold">Languages</div>
-                  <div className="flex flex-wrap gap-3">
-                    {LANGUAGES.map((item) => (
-                      <div key={item} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={item}
-                          checked={languages.includes(item)}
-                          onCheckedChange={(checked) => {
-                            if (checked && languages.length < maxSelected) {
-                              setLanguages((prev) => [...prev, item]);
-                            } else {
-                              setLanguages((prev) =>
-                                prev.filter((c) => c !== item)
-                              );
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor={item}
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {item}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      storage.setLocalStorage(
-                        storage.KEYS.newsDataCategories,
-                        categories
-                      );
-                      storage.setLocalStorage(
-                        storage.KEYS.newsDataCountries,
-                        countries
-                      );
-                      storage.setLocalStorage(
-                        storage.KEYS.newsDataLanguages,
-                        languages
-                      );
-                      storage.removeLocalStorage(storage.KEYS.newsDataArticles);
-                      setShowSettings(false);
-                    }}
-                  >
-                    Save settings
-                  </Button>
-                </div>
-                <Separator />
-              </div>
-            )}
+      <ScrollArea className="h-full" onScroll={handleScroll}>
+        <div className={`flex flex-col gap-2`}>
+          {showSettings && (
             <div className="flex flex-col gap-2">
-              {(articles || []).map((article) => {
-                return (
-                  <div key={article.article_id} className="flex gap-2">
-                    <div className="w-16">
-                      <img
-                        src={article.image_url}
-                        alt=""
-                        className="w-full h-auto"
+              <div className="flex gap-4 items-center">
+                <div className="text-lg font-bold">Categories</div>
+                <div className="flex flex-wrap gap-3">
+                  {CATEGORIES.map((item) => (
+                    <div key={item} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={item}
+                        checked={categories.includes(item)}
+                        onCheckedChange={(checked) => {
+                          if (checked && categories.length < maxSelected) {
+                            setCategories((prev) => [...prev, item]);
+                          } else {
+                            setCategories((prev) =>
+                              prev.filter((c) => c !== item)
+                            );
+                          }
+                        }}
                       />
-                    </div>
-                    <div className="flex-1">
-                      <a
-                        href={article.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-gray-700 dark:text-gray-300 font-bold mb-2"
+                      <label
+                        htmlFor={item}
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        {article.title}
-                      </a>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className="text-gray-700 dark:text-gray-400 text-sm"
-                              dangerouslySetInnerHTML={{
-                                __html: article.description?.replaceAll(
-                                  '\n',
-                                  '<br />'
-                                ),
-                              }}
-                            ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="max-w-md">{article.content}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                        {item}
+                      </label>
                     </div>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-4 items-center">
+                <div className="text-lg font-bold">Countries</div>
+                <div className="flex flex-wrap gap-3">
+                  {COUNTRIES.map((item) => (
+                    <div key={item} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={item}
+                        checked={countries.includes(item)}
+                        onCheckedChange={(checked) => {
+                          if (checked && countries.length < maxSelected) {
+                            setCountries((prev) => [...prev, item]);
+                          } else {
+                            setCountries((prev) =>
+                              prev.filter((c) => c !== item)
+                            );
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={item}
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {item}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-4 items-center">
+                <div className="text-lg font-bold">Languages</div>
+                <div className="flex flex-wrap gap-3">
+                  {LANGUAGES.map((item) => (
+                    <div key={item} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={item}
+                        checked={languages.includes(item)}
+                        onCheckedChange={(checked) => {
+                          if (checked && languages.length < maxSelected) {
+                            setLanguages((prev) => [...prev, item]);
+                          } else {
+                            setLanguages((prev) =>
+                              prev.filter((c) => c !== item)
+                            );
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={item}
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {item}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    storage.setLocalStorage(
+                      storage.KEYS.newsDataCategories,
+                      categories
+                    );
+                    storage.setLocalStorage(
+                      storage.KEYS.newsDataCountries,
+                      countries
+                    );
+                    storage.setLocalStorage(
+                      storage.KEYS.newsDataLanguages,
+                      languages
+                    );
+                    storage.removeLocalStorage(storage.KEYS.newsDataArticles);
+                    setShowSettings(false);
+                  }}
+                >
+                  Save settings
+                </Button>
+              </div>
+              <Separator />
             </div>
+          )}
+          <div className="flex flex-col gap-2">
+            {(articles || []).map((article) => {
+              return (
+                <div key={article.article_id} className="flex gap-2">
+                  <div className="w-16">
+                    <img
+                      src={article.image_url}
+                      alt=""
+                      className="w-full h-auto"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <a
+                      href={article.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-gray-700 dark:text-gray-300 font-bold mb-2"
+                    >
+                      {article.title}
+                    </a>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className="text-gray-700 dark:text-gray-400 text-sm"
+                            dangerouslySetInnerHTML={{
+                              __html: article.description?.replaceAll(
+                                '\n',
+                                '<br />'
+                              ),
+                            }}
+                          ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-md">{article.content}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </ScrollArea>
-      </CardContent>
+        </div>
+      </ScrollArea>
     </Window>
   );
 };

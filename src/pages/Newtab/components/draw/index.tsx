@@ -1,14 +1,18 @@
 import Window from '@/components/common/window';
-import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
-import { CardContent } from '@/components/ui/card';
 import storage from '@/lib/storage';
+import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import { Tldraw } from '@tldraw/tldraw';
 import '@tldraw/tldraw/tldraw.css';
 import React from 'react';
 
 const Draw = () => {
-  const { state, isFullScreen, handleChangeState, handleToggleFullScreen } =
-    useWindowState(storage.KEYS.drawWindowRndState);
+  const {
+    state,
+    isFullScreen,
+    handleChangeState,
+    handleToggleFullScreen,
+    handleClose,
+  } = useWindowState('draw');
 
   if (!state) {
     return null;
@@ -19,11 +23,10 @@ const Draw = () => {
       {...state}
       onChangeState={handleChangeState}
       onToggleFullScreen={handleToggleFullScreen}
+      onClose={handleClose}
       cardOpacity={0.85}
     >
-      <CardContent className="pt-2 h-full overflow-y-auto">
-        <Tldraw hideUi={!isFullScreen} />
-      </CardContent>
+      <Tldraw hideUi={!isFullScreen} />
     </Window>
   );
 };

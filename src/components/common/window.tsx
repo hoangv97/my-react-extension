@@ -1,5 +1,9 @@
-import { Card } from '@/components/ui/card';
-import { EnterFullScreenIcon, ExitFullScreenIcon } from '@radix-ui/react-icons';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Cross1Icon,
+  EnterFullScreenIcon,
+  ExitFullScreenIcon,
+} from '@radix-ui/react-icons';
 import React, { useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import { useTheme } from '@/components/theme-provider';
@@ -11,10 +15,11 @@ interface WindowProps {
   height: number | string;
   cardClassName?: string;
   cardOpacity?: number;
-  onChangeState?: (state: any) => void;
-  onToggleFullScreen?: (isFullScreen: boolean) => void;
   children?: React.ReactNode;
   subButtons?: React.ReactNode;
+  onChangeState?: (state: any) => void;
+  onToggleFullScreen?: (isFullScreen: boolean) => void;
+  onClose?: () => void;
 }
 
 const Window = ({
@@ -24,10 +29,11 @@ const Window = ({
   height,
   cardClassName,
   cardOpacity,
-  onChangeState,
-  onToggleFullScreen,
   children,
   subButtons,
+  onChangeState,
+  onToggleFullScreen,
+  onClose,
 }: WindowProps) => {
   const [state, setState] = React.useState({
     x,
@@ -102,7 +108,9 @@ const Window = ({
         className={`w-full h-full ${cardClassName || ''}`}
         style={{ background: getCardBackground() }}
       >
-        {children}
+        <CardContent className="pt-2 h-full overflow-y-auto">
+          {children}
+        </CardContent>
         <div className="absolute right-2 bottom-2 flex gap-2 text-white hover:text-black dark:text-black hover:dark:text-white">
           {subButtons}
           {isFullScreen ? (
@@ -116,6 +124,10 @@ const Window = ({
               onClick={toggleFullScreen}
             />
           )}
+          <Cross1Icon
+            className="cursor-pointer hover:text-red-500"
+            onClick={onClose}
+          />
         </div>
       </Card>
     </Rnd>

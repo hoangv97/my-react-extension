@@ -1,6 +1,6 @@
 const storage = {
   KEYS: {
-    hiddenCards: 'hiddenCards',
+    activeWindowKeys: 'activeWindowKeys',
     bgImages: 'bgImages',
     cmcListings: 'cmcListings',
     newsTopHeadlines: 'newsTopHeadlines',
@@ -11,17 +11,6 @@ const storage = {
     noteContent: 'noteContent',
     mindmapData: 'mindmapData',
     codeDemoData: 'codeDemoData',
-
-    bookmarkWindowRndState: 'bookmarkWindowRndState',
-    coinWindowRndState: 'coinWindowRndState',
-    newsWindowRndState: 'newsWindowRndState',
-    newsDataWindowRndState: 'newsDataWindowRndState',
-    noteWindowRndState: 'noteWindowRndState',
-    mediapipeWindowRndState: 'mediapipeWindowRndState',
-    mindmapWindowRndState: 'mindmapWindowRndState',
-    drawWindowRndState: 'drawWindowRndState',
-    cameraWindowRndState: 'cameraWindowRndState',
-    codeDemoWindowRndState: 'codeDemoWindowRndState',
   },
   getLocalStorage(key: string, defaultVal: any = null) {
     let result = JSON.parse(localStorage.getItem(key) || 'null');

@@ -12,7 +12,7 @@ import {
 import { DashboardIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import LocalStorage from './local-storage';
-import Cards from './cards';
+import Windows from './windows';
 
 const Settings = () => {
   return (
@@ -37,9 +37,9 @@ const Settings = () => {
             <ModeToggle />
           </div>
           <Separator className="my-3" />
-          <LocalStorage />
+          <Windows />
           <Separator className="my-3" />
-          <Cards />
+          <LocalStorage />
           <Separator className="my-3" />
         </div>
       </SheetContent>
