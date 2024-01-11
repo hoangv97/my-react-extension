@@ -24,7 +24,7 @@ import {
   selector,
 } from '../../store/mindmap';
 import ContextMenu from './context-menu';
-import { ListDialog } from './dialogs/list';
+import { ListDialog } from './dialogs/files';
 import { SaveDialog } from './dialogs/save';
 import MindMapEdge from './edge';
 import MindMapNode from './node';
@@ -263,6 +263,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                   onClick={() => {
                     // TODO: if there is unsaved changes, ask user to save
                     setData([], []);
+                    setSelectedNode();
                     setViewport({ x: 0, y: 0, zoom: 1 });
                   }}
                 >
@@ -272,15 +273,10 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                   Files <MenubarShortcut>⌘O</MenubarShortcut>
                 </MenubarItem>
                 {!!currentFile && (
-                  <MenubarItem onClick={onSave}>Save</MenubarItem>
+                  <MenubarItem onClick={onSave}>
+                    Save <MenubarShortcut>⌘S</MenubarShortcut>
+                  </MenubarItem>
                 )}
-                <MenubarItem
-                  onClick={() => {
-                    // TODO
-                  }}
-                >
-                  Save<MenubarShortcut>⌘S</MenubarShortcut>
-                </MenubarItem>
                 <MenubarItem onClick={() => setOpenSaveDialog(true)}>
                   Save as new file
                 </MenubarItem>

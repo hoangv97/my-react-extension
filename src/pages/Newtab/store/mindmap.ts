@@ -41,7 +41,7 @@ export type RFMindmapState = {
   setMindmapLayout: () => void;
   setMindmapConfig: (key: string, value: any) => void;
   setMindmapCurrentFile: (file: any) => void;
-  setMindmapSelectedNode: (node: Node) => void;
+  setMindmapSelectedNode: (node?: Node) => void;
 };
 
 export const selector = (state: RFMindmapState) => ({
@@ -65,7 +65,7 @@ export const selector = (state: RFMindmapState) => ({
   setSelectedNode: state.setMindmapSelectedNode,
 });
 
-const DEFAULT_ROOT_NAME = 'Enter something...';
+const DEFAULT_ROOT_NAME = 'New Node';
 
 export const DEFAULT_ROOT_NODE: Node = {
   id: 'root',
@@ -335,7 +335,7 @@ export const useMindmapSlice = (set: any, get: any) => {
         mindmapCurrentFile: file,
       });
     },
-    setMindmapSelectedNode: (node: Node) => {
+    setMindmapSelectedNode: (node?: Node) => {
       set({
         mindmapSelectedNode: node,
       });
