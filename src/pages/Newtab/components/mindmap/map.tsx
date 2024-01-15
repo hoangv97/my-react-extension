@@ -319,6 +319,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                       return;
                     }
                     setCurrentFile(undefined);
+                    saveCurrentFile('');
                     setData([], []);
                     setSelectedNode();
                     setViewport({ x: 0, y: 0, zoom: 1 });
