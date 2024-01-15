@@ -18,18 +18,20 @@ import { shallow } from 'zustand/shallow';
 import FlashcardEditorDialog from '../dialogs/flashcards/editor';
 import {
   FlashcardProps,
-  createFlashcard,
-  deleteFlashcard,
-  getFlashcards,
-  updateFlashcard,
+  getNewFlashcard,
+  getUpdateFlashcard,
 } from '../lib/flashcards';
 import './index.scss';
 
 export default function NodeDetail() {
-  const { selectedNode, nodes, edges, setData, setSelectedNode } = useStore(
-    selector,
-    shallow
-  );
+  const {
+    selectedNode,
+    nodes,
+    edges,
+    setData,
+    setSelectedNode,
+    updateNodeData,
+  } = useStore(selector, shallow);
 
   const [open, setOpen] = useState(false);
   const [sources, setSources] = useState<Node[]>([]);
@@ -57,16 +59,27 @@ export default function NodeDetail() {
   }, [selectedNode, nodes, edges, open]);
 
   useEffect(() => {
-    loadFlashcards();
+    if (selectedNode) {
+      updateNodeData(selectedNode.id, {
+        flashcards,
+      });
+      setSelectedNode({
+        ...selectedNode,
+        data: { ...selectedNode.data, flashcards },
+      });
+    }
+  }, [flashcards]);
+
+  useEffect(() => {
+    setFlashcards(selectedNode?.data.flashcards || []);
   }, [selectedNode]);
 
-  const loadFlashcards = useCallback(() => {
+  const reloadFlashcards = useCallback(() => {
     if (selectedNode) {
       setLoadingFlashcards(true);
       setTimeout(() => {
-        setFlashcards(getFlashcards(selectedNode.id));
         setLoadingFlashcards(false);
-      }, 500);
+      }, 1000);
     }
   }, [selectedNode]);
 
@@ -202,10 +215,7 @@ export default function NodeDetail() {
                 {newFlashcardDialogOpen && (
                   <FlashcardEditorDialog
                     onSave={(data) => {
-                      createFlashcard(selectedNode.id, {
-                        ...data,
-                      });
-                      loadFlashcards();
+                      setFlashcards((prev) => [...prev, getNewFlashcard(data)]);
                     }}
                     onClose={() => {
                       setNewFlashcardDialogOpen(false);
@@ -216,20 +226,31 @@ export default function NodeDetail() {
                   <FlashcardEditorDialog
                     data={selectedFlashcard}
                     onSave={(data) => {
-                      updateFlashcard(selectedNode.id, {
-                        ...selectedFlashcard,
-                        ...data,
-                      });
+                      setFlashcards((prev) =>
+                        prev.map((flashcard) => {
+                          if (flashcard.id === selectedFlashcard.id) {
+                            return getUpdateFlashcard({
+                              ...flashcard,
+                              ...data,
+                            });
+                          }
+                          return flashcard;
+                        })
+                      );
                       setSelectedFlashcard(undefined);
                       setFlashcardEditorDialogOpen(false);
-                      loadFlashcards();
+                      reloadFlashcards();
                     }}
                     onDelete={() => {
                       if (window.confirm('Are you sure?')) {
-                        deleteFlashcard(selectedNode.id, selectedFlashcard.id);
+                        setFlashcards((prev) =>
+                          prev.filter(
+                            (flashcard) => flashcard.id !== selectedFlashcard.id
+                          )
+                        );
                         setSelectedFlashcard(undefined);
                         setFlashcardEditorDialogOpen(false);
-                        loadFlashcards();
+                        reloadFlashcards();
                       }
                     }}
                     onClose={() => {

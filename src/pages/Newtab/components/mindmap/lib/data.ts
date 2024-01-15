@@ -1,6 +1,5 @@
 import storage from '@/lib/storage';
 import { nanoid } from 'nanoid';
-import { deleteAllFlashcards } from './flashcards';
 
 export interface FileProps {
   id: string;
@@ -62,7 +61,6 @@ export const updateFile = (id: string, data: any) => {
 export const deleteFile = (id: string) => {
   const files = getFiles();
   saveFiles(files.filter((file) => file.id !== id));
-  deleteAllFlashcards(id);
 };
 
 export const getCurrentFile = () => {

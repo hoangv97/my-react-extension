@@ -14,7 +14,6 @@ function MindMapNode({ id, data, selected, ...others }: NodeProps<NodeData>) {
     selector,
     shallow
   );
-  console.log(data);
 
   return (
     <>
