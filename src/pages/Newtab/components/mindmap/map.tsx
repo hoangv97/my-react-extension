@@ -49,6 +49,7 @@ import { LAYOUT_OPTIONS } from './lib/layout';
 import MindMapNode from './node';
 import NodeDetail from './node-detail';
 import NodeStyleDialog from './dialogs/nodes/style';
+import FlashcardListDialog from './dialogs/flashcards/list';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -98,6 +99,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
     nodeId: '',
     nodeData: {},
   });
+  const [flashcardListDialogOpen, setFlashcardListDialogOpen] = useState(false);
 
   const store = useStoreApi();
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
@@ -211,7 +213,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
   const onSave = useCallback(() => {
     if (rfInstance) {
       const data = rfInstance.toObject();
-      console.log('save data', data);
+      // console.log('save data', data);
       updateFile(currentFile.id, data);
     }
   }, [rfInstance, currentFile]);
@@ -349,6 +351,14 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                   Add node
                 </MenubarItem>
                 <MenubarSeparator />
+                <MenubarItem
+                  onClick={() => {
+                    setFlashcardListDialogOpen(true);
+                  }}
+                >
+                  Show flashcards
+                </MenubarItem>
+                <MenubarSeparator />
                 <MenubarItem>Find</MenubarItem>
               </MenubarContent>
             </MenubarMenu>
@@ -390,6 +400,11 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
             <FilesDialog
               onRestore={onRestore}
               onClose={() => setOpenFileListDialog(false)}
+            />
+          )}
+          {flashcardListDialogOpen && (
+            <FlashcardListDialog
+              onClose={() => setFlashcardListDialogOpen(false)}
             />
           )}
         </div>
