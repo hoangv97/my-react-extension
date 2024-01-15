@@ -8,13 +8,22 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import useStore from '@/pages/Newtab/store';
+import { selector } from '@/pages/Newtab/store/mindmap';
 import { ArrowUpRightSquareIcon } from 'lucide-react';
 import { Editor } from 'novel';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Node, Panel } from 'reactflow';
 import { shallow } from 'zustand/shallow';
-import useStore from '../../store';
-import { selector } from '../../store/mindmap';
+import FlashcardEditorDialog from '../dialogs/flashcards/editor';
+import {
+  FlashcardProps,
+  createFlashcard,
+  deleteFlashcard,
+  getFlashcards,
+  updateFlashcard,
+} from '../lib/flashcards';
+import './index.scss';
 
 export default function NodeDetail() {
   const { selectedNode, nodes, edges, setData, setSelectedNode } = useStore(
@@ -25,6 +34,12 @@ export default function NodeDetail() {
   const [open, setOpen] = useState(false);
   const [sources, setSources] = useState<Node[]>([]);
   const [targets, setTargets] = useState<Node[]>([]);
+  const [flashcards, setFlashcards] = useState<FlashcardProps[]>([]);
+  const [loadingFlashcards, setLoadingFlashcards] = useState(false);
+  const [newFlashcardDialogOpen, setNewFlashcardDialogOpen] = useState(false);
+  const [selectedFlashcard, setSelectedFlashcard] = useState<FlashcardProps>();
+  const [flashcardEditorDialogOpen, setFlashcardEditorDialogOpen] =
+    useState(false);
 
   useEffect(() => {
     if (selectedNode) {
@@ -40,6 +55,20 @@ export default function NodeDetail() {
       setTargets(targets);
     }
   }, [selectedNode, nodes, edges, open]);
+
+  useEffect(() => {
+    loadFlashcards();
+  }, [selectedNode]);
+
+  const loadFlashcards = useCallback(() => {
+    if (selectedNode) {
+      setLoadingFlashcards(true);
+      setTimeout(() => {
+        setFlashcards(getFlashcards(selectedNode.id));
+        setLoadingFlashcards(false);
+      }, 500);
+    }
+  }, [selectedNode]);
 
   const selectOtherNode = useCallback(
     (node: Node) => {
@@ -137,6 +166,78 @@ export default function NodeDetail() {
                   </div>
                 </>
               )}
+            </div>
+            <div className="px-6">
+              <div className="text-lg mb-2">Flashcards</div>
+              <div className="flex flex-wrap gap-2">
+                {!loadingFlashcards &&
+                  flashcards.map((flashcard) => (
+                    <Card
+                      key={flashcard.id}
+                      className="cursor-pointer max-w-[250px]"
+                      onClick={() => {
+                        setSelectedFlashcard(flashcard);
+                        setFlashcardEditorDialogOpen(true);
+                      }}
+                    >
+                      <CardContent>
+                        <Editor
+                          defaultValue={flashcard.front || ''}
+                          disableLocalStorage={false}
+                          className="preview-editor relative min-h-[100px] mb-5 w-full max-w-screen-lg bg-background"
+                        />
+                      </CardContent>
+                    </Card>
+                  ))}
+                <Card
+                  className="cursor-pointer min-w-[100px]"
+                  onClick={() => {
+                    setNewFlashcardDialogOpen(true);
+                  }}
+                >
+                  <CardContent className="pt-6 h-full flex items-center justify-center text-lg">
+                    <div>Add</div>
+                  </CardContent>
+                </Card>
+                {newFlashcardDialogOpen && (
+                  <FlashcardEditorDialog
+                    onSave={(data) => {
+                      createFlashcard(selectedNode.id, {
+                        ...data,
+                      });
+                      loadFlashcards();
+                    }}
+                    onClose={() => {
+                      setNewFlashcardDialogOpen(false);
+                    }}
+                  />
+                )}
+                {flashcardEditorDialogOpen && !!selectedFlashcard && (
+                  <FlashcardEditorDialog
+                    data={selectedFlashcard}
+                    onSave={(data) => {
+                      updateFlashcard(selectedNode.id, {
+                        ...selectedFlashcard,
+                        ...data,
+                      });
+                      setSelectedFlashcard(undefined);
+                      setFlashcardEditorDialogOpen(false);
+                      loadFlashcards();
+                    }}
+                    onDelete={() => {
+                      if (window.confirm('Are you sure?')) {
+                        deleteFlashcard(selectedNode.id, selectedFlashcard.id);
+                        setSelectedFlashcard(undefined);
+                        setFlashcardEditorDialogOpen(false);
+                        loadFlashcards();
+                      }
+                    }}
+                    onClose={() => {
+                      setFlashcardEditorDialogOpen(false);
+                    }}
+                  />
+                )}
+              </div>
             </div>
           </ScrollArea>
         </SheetContent>

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import useStore from '../../store';
 import { shallow } from 'zustand/shallow';
 import { selector } from '../../store/mindmap';
@@ -16,6 +16,7 @@ export default function ContextMenu({
   left,
   right,
   bottom,
+  onOpenStyleDialog,
   ...props
 }: any) {
   const { getNode } = useReactFlow();
@@ -33,7 +34,9 @@ export default function ContextMenu({
   }, [id, getNode]);
 
   const onDeleteNode = useCallback(() => {
-    deleteNode(id);
+    if (window.confirm('Are you sure you want to delete this node?')) {
+      deleteNode(id);
+    }
   }, [id]);
 
   const onGenerateNodes = useCallback(() => {
@@ -49,6 +52,9 @@ export default function ContextMenu({
       <Command className="rounded-lg border shadow-md">
         <CommandList>
           <CommandGroup heading={`Node: ${id}`}>
+            <CommandItem>
+              <div onClick={onOpenStyleDialog}>Style</div>
+            </CommandItem>
             <CommandItem>
               <div onClick={onGenerateNodes}>Generate</div>
             </CommandItem>

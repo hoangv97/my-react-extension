@@ -33,7 +33,7 @@ export type RFMindmapState = {
   onMindmapNodesChange: OnNodesChange;
   onMindmapEdgesChange: OnEdgesChange;
   addMindmapChildNode: (parentNode: Node, position: XYPosition) => void;
-  updateMindmapNodeLabel: (nodeId: string, label: string) => void;
+  updateMindmapNodeData: (nodeId: string, data: any) => void;
   deleteMindmapNode: (nodeId: string) => void;
   addMindmapNode: (node: Node, position: XYPosition) => void;
   setMindmapData: (nodes: Node[], edges: Edge[]) => void;
@@ -54,7 +54,7 @@ export const selector = (state: RFMindmapState) => ({
   onNodesChange: state.onMindmapNodesChange,
   onEdgesChange: state.onMindmapEdgesChange,
   addChildNode: state.addMindmapChildNode,
-  updateNodeLabel: state.updateMindmapNodeLabel,
+  updateNodeData: state.updateMindmapNodeData,
   deleteNode: state.deleteMindmapNode,
   addNode: state.addMindmapNode,
   setData: state.setMindmapData,
@@ -131,12 +131,12 @@ export const useMindmapSlice = (set: any, get: any) => {
         mindmapEdges: [...get().mindmapEdges, newEdge],
       });
     },
-    updateMindmapNodeLabel: (nodeId: string, label: string) => {
+    updateMindmapNodeData: (nodeId: string, data: any) => {
       set({
         mindmapNodes: get().mindmapNodes.map((node: Node) => {
           if (node.id === nodeId) {
             // it's important to create a new object here, to inform React Flow about the changes
-            node.data = { ...node.data, label };
+            node.data = { ...node.data, ...data };
           }
 
           return node;

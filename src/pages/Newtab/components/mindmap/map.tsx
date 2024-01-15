@@ -1,4 +1,16 @@
-import storage from '@/lib/storage';
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from '@/components/ui/menubar';
 import { nanoid } from 'nanoid';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
@@ -24,25 +36,19 @@ import {
   selector,
 } from '../../store/mindmap';
 import ContextMenu from './context-menu';
-import { ListDialog } from './dialogs/files';
-import { SaveDialog } from './dialogs/save';
+import FilesDialog from './dialogs/files/list';
+import SaveFileDialog from './dialogs/files/save';
 import MindMapEdge from './edge';
-import MindMapNode from './node';
 import {
-  Menubar,
-  MenubarCheckboxItem,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from '@/components/ui/menubar';
-import NodeDetail from './node-detail';
+  createFile,
+  getCurrentFile,
+  saveCurrentFile,
+  updateFile,
+} from './lib/data';
 import { LAYOUT_OPTIONS } from './lib/layout';
+import MindMapNode from './node';
+import NodeDetail from './node-detail';
+import NodeStyleDialog from './dialogs/nodes/style';
 
 const nodeTypes = {
   mindmap: MindMapNode,
@@ -81,14 +87,27 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
     currentFile,
     setCurrentFile,
     setSelectedNode,
+    updateNodeData,
   } = useStore(selector, shallow);
   const connectingNodeId = useRef<string | null>(null);
   const [rfInstance, setRfInstance] = useState<any>(null);
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [openFileListDialog, setOpenFileListDialog] = useState(false);
+  const [nodeStyleDialog, setNodeStyleDialog] = useState({
+    open: false,
+    nodeId: '',
+    nodeData: {},
+  });
 
   const store = useStoreApi();
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
+
+  useEffect(() => {
+    const currentFile = getCurrentFile();
+    if (currentFile) {
+      onRestore(currentFile);
+    }
+  }, []);
 
   useEffect(() => {
     if (loadingStatus === LOADING_STATUS_MESSAGES.generatingNodes) {
@@ -96,31 +115,38 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
     }
   }, [nodes, edges, loadingStatus]);
 
-  const getChildNodePosition = (event: MouseEvent, parentNode?: Node) => {
-    const { domNode } = store.getState();
+  const getChildNodePosition = useCallback(
+    (event: MouseEvent, parentNode?: Node) => {
+      const { domNode } = store.getState();
 
-    if (
-      !domNode ||
-      // we need to check if these properties exist, because when a node is not initialized yet,
-      // it doesn't have a positionAbsolute nor a width or height
-      !parentNode?.positionAbsolute ||
-      !parentNode?.width ||
-      !parentNode?.height
-    ) {
-      return;
-    }
+      if (
+        !domNode ||
+        // we need to check if these properties exist, because when a node is not initialized yet,
+        // it doesn't have a positionAbsolute nor a width or height
+        !parentNode?.positionAbsolute ||
+        !parentNode?.width ||
+        !parentNode?.height
+      ) {
+        return;
+      }
 
-    const panePosition = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
+      const panePosition = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-    // we are calculating with positionAbsolute here because child nodes are positioned relative to their parent
-    return {
-      x: panePosition.x - parentNode.positionAbsolute.x + parentNode.width / 2,
-      y: panePosition.y - parentNode.positionAbsolute.y + parentNode.height / 2,
-    };
-  };
+      // we are calculating with positionAbsolute here because child nodes are positioned relative to their parent
+      return {
+        x:
+          panePosition.x - parentNode.positionAbsolute.x + parentNode.width / 2,
+        y:
+          panePosition.y -
+          parentNode.positionAbsolute.y +
+          parentNode.height / 2,
+      };
+    },
+    [screenToFlowPosition]
+  );
 
   const onConnectStart: OnConnectStart = useCallback((_, { nodeId }) => {
     connectingNodeId.current = nodeId;
@@ -160,6 +186,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
         right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
         bottom:
           event.clientY >= pane.height - 200 && pane.height - event.clientY,
+        data: node.data,
       });
     },
     [setMenu]
@@ -172,47 +199,26 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
     (state: any) => {
       if (rfInstance) {
         const data = rfInstance.toObject();
-        const mindmapList = storage.getLocalStorage(
-          storage.KEYS.mindmapData,
-          []
-        );
-        const saveFile = {
-          id: nanoid(),
-          name: state.name,
-          data: JSON.stringify(data),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        storage.setLocalStorage(storage.KEYS.mindmapData, [
-          ...mindmapList,
-          saveFile,
-        ]);
+        const file = createFile(state.name, data);
+        setCurrentFile(file);
+        saveCurrentFile(file.id);
       }
     },
-    [rfInstance]
+    [rfInstance, setCurrentFile]
   );
 
   const onSave = useCallback(() => {
     if (rfInstance) {
       const data = rfInstance.toObject();
-      const mindmapList = storage.getLocalStorage(storage.KEYS.mindmapData, []);
-      const saveFile = {
-        ...currentFile,
-        data: JSON.stringify(data),
-        updatedAt: new Date().toISOString(),
-      };
-      const newFiles = mindmapList.map((file: any) =>
-        file.id === saveFile.id ? saveFile : file
-      );
-      storage.setLocalStorage(storage.KEYS.mindmapData, newFiles);
-      alert(`Saved ${saveFile.name}`);
+      updateFile(currentFile.id, data);
     }
-  }, [rfInstance]);
+  }, [rfInstance, currentFile]);
 
   const onRestore = useCallback(
     (file: any) => {
       const restoreFlow = async () => {
         setCurrentFile(file);
+        saveCurrentFile(file.id);
         const flow = JSON.parse(file.data);
 
         if (flow) {
@@ -224,7 +230,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
 
       restoreFlow();
     },
-    [setData, setViewport]
+    [setData, setViewport, setCurrentFile]
   );
 
   return (
@@ -251,7 +257,32 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
       }}
     >
       <Background />
-      {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+      {menu && (
+        <ContextMenu
+          onClick={onPaneClick}
+          onOpenStyleDialog={() => {
+            setNodeStyleDialog({
+              open: true,
+              nodeId: menu.id,
+              nodeData: menu.data,
+            });
+            setMenu(null);
+          }}
+          {...menu}
+        />
+      )}
+      {nodeStyleDialog.open && (
+        <NodeStyleDialog
+          nodeId={nodeStyleDialog.nodeId}
+          nodeData={nodeStyleDialog.nodeData}
+          onSave={(nodeId, data) => {
+            updateNodeData(nodeId, data);
+          }}
+          onClose={() => {
+            setNodeStyleDialog({ open: false, nodeId: '', nodeData: {} });
+          }}
+        />
+      )}
       <Controls />
       <Panel position="top-left">
         <div className="flex gap-2 z-50">
@@ -261,7 +292,15 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
               <MenubarContent>
                 <MenubarItem
                   onClick={() => {
-                    // TODO: if there is unsaved changes, ask user to save
+                    if (
+                      currentFile &&
+                      !window.confirm(
+                        'Are you sure you want to create a new file?'
+                      )
+                    ) {
+                      return;
+                    }
+                    setCurrentFile(undefined);
                     setData([], []);
                     setSelectedNode();
                     setViewport({ x: 0, y: 0, zoom: 1 });
@@ -272,11 +311,9 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                 <MenubarItem onClick={() => setOpenFileListDialog(true)}>
                   Files <MenubarShortcut>⌘O</MenubarShortcut>
                 </MenubarItem>
-                {!!currentFile && (
-                  <MenubarItem onClick={onSave}>
-                    Save <MenubarShortcut>⌘S</MenubarShortcut>
-                  </MenubarItem>
-                )}
+                <MenubarItem onClick={onSave} disabled={!currentFile}>
+                  Save <MenubarShortcut>⌘S</MenubarShortcut>
+                </MenubarItem>
                 <MenubarItem onClick={() => setOpenSaveDialog(true)}>
                   Save as new file
                 </MenubarItem>
@@ -295,6 +332,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                 >
                   Add node
                 </MenubarItem>
+                <MenubarSeparator />
                 <MenubarItem>Find</MenubarItem>
               </MenubarContent>
             </MenubarMenu>
@@ -327,13 +365,13 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
             </MenubarMenu>
           </Menubar>
           {openSaveDialog && (
-            <SaveDialog
+            <SaveFileDialog
               onSave={onSaveAsNewFile}
               onClose={() => setOpenSaveDialog(false)}
             />
           )}
           {openFileListDialog && (
-            <ListDialog
+            <FilesDialog
               onRestore={onRestore}
               onClose={() => setOpenFileListDialog(false)}
             />
@@ -341,7 +379,10 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
         </div>
       </Panel>
       <Panel position="top-right">
-        <div>{loadingStatus}</div>
+        <div className="flex gap-2">
+          {!!currentFile && <div>{currentFile.name}</div>}
+          {!!loadingStatus && <div>{loadingStatus}</div>}
+        </div>
       </Panel>
       {!!config.showMinimap && isFullScreen && <MiniMap />}
       <NodeDetail />

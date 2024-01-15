@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -9,23 +8,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import storage from '@/lib/storage';
 import React, { useEffect } from 'react';
+import { deleteFile, getFiles } from '../../lib/data';
 
 interface RestoreDialogProps {
   onRestore: (file: any) => void;
   onClose: () => void;
 }
 
-export function ListDialog({ onRestore, onClose }: RestoreDialogProps) {
-  const getFiles = () => {
-    const files = storage.getLocalStorage(storage.KEYS.mindmapData, []);
-    files.sort((a: any, b: any) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    return files;
-  };
-
+export default function FilesDialog({
+  onRestore,
+  onClose,
+}: RestoreDialogProps) {
   const [open, setOpen] = React.useState(true);
   const [files, setFiles] = React.useState<any[]>(getFiles());
   const [selectedFile, setSelectedFile] = React.useState<any>();
@@ -73,12 +67,14 @@ export function ListDialog({ onRestore, onClose }: RestoreDialogProps) {
                 variant={'destructive'}
                 size="sm"
                 onClick={() => {
-                  const newFiles = files.filter(
-                    (file) => file.id !== selectedFile.id
-                  );
-                  storage.setLocalStorage(storage.KEYS.mindmapData, newFiles);
-                  setFiles(newFiles);
-                  setSelectedFile(undefined);
+                  if (
+                    window.confirm('Are you sure you want to delete this file?')
+                  ) {
+                    deleteFile(selectedFile.id);
+                    const newFiles = getFiles();
+                    setFiles(newFiles);
+                    setSelectedFile(undefined);
+                  }
                 }}
               >
                 Delete

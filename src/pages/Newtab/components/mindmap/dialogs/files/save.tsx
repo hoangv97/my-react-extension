@@ -17,7 +17,7 @@ interface SaveDialogProps {
   onClose: () => void;
 }
 
-export function SaveDialog({ onSave, onClose }: SaveDialogProps) {
+export default function SaveFileDialog({ onSave, onClose }: SaveDialogProps) {
   const [state, setState] = React.useState<any>({
     name: '',
   });

@@ -88,7 +88,7 @@ const Bookmark = () => {
               <div className="text-gray-700 dark:text-gray-200 font-bold mb-2">
                 {folder.title}
               </div>
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1 gap-y-5">
                 {folder.sites.map((site: any) => {
                   return (
                     <UrlItem key={site.url} url={site.url} title={site.title} />
