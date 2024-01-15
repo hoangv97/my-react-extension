@@ -101,6 +101,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
 
   const store = useStoreApi();
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
+  const autoSaveInterval = useRef<any>(null);
 
   useEffect(() => {
     const currentFile = getCurrentFile();
@@ -114,6 +115,20 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
       fitView();
     }
   }, [nodes, edges, loadingStatus]);
+
+  useEffect(() => {
+    // auto save
+    if (currentFile) {
+      autoSaveInterval.current = setInterval(() => {
+        onSave();
+      }, 5000);
+    } else {
+      clearInterval(autoSaveInterval.current);
+    }
+    return () => {
+      clearInterval(autoSaveInterval.current);
+    };
+  }, [currentFile]);
 
   const getChildNodePosition = useCallback(
     (event: MouseEvent, parentNode?: Node) => {
