@@ -8,6 +8,7 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
   XYPosition,
+  MarkerType,
 } from 'reactflow';
 import { nanoid } from 'nanoid';
 import openai from '@/lib/openai';

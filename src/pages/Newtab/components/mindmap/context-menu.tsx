@@ -20,7 +20,8 @@ export default function ContextMenu({
   ...props
 }: any) {
   const { getNode } = useReactFlow();
-  const { deleteNode, addNode, generateNodes } = useStore(selector, shallow);
+  const { nodes, edges, setData, deleteNode, addNode, generateNodes } =
+    useStore(selector, shallow);
 
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
@@ -43,6 +44,19 @@ export default function ContextMenu({
     generateNodes(id);
   }, [id]);
 
+  const detachParent = useCallback(() => {
+    if (
+      window.confirm(
+        'Are you sure you want to detach this node from its parent?'
+      )
+    ) {
+      setData(
+        nodes,
+        edges.filter((edge: any) => edge.target !== id)
+      );
+    }
+  }, [id, nodes, edges]);
+
   return (
     <div
       style={{ top, left, right, bottom }}
@@ -53,10 +67,13 @@ export default function ContextMenu({
         <CommandList>
           <CommandGroup heading={`Node: ${id}`}>
             <CommandItem>
+              <div onClick={onGenerateNodes}>Generate</div>
+            </CommandItem>
+            <CommandItem>
               <div onClick={onOpenStyleDialog}>Style</div>
             </CommandItem>
             <CommandItem>
-              <div onClick={onGenerateNodes}>Generate</div>
+              <div onClick={detachParent}>Detach parent</div>
             </CommandItem>
             <CommandItem>
               <div onClick={duplicateNode}>Duplicate</div>

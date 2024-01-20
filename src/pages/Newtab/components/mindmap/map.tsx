@@ -169,6 +169,25 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
         if (parentNode && childNodePosition) {
           addChildNode(parentNode, childNodePosition);
         }
+      } else {
+        const parentNode = (event.target as Element).parentElement;
+        const parentIsNode = parentNode?.classList.contains('react-flow__node');
+        const targetNodeId = parentNode?.getAttribute('data-id');
+        if (
+          parentNode &&
+          parentIsNode &&
+          connectingNodeId.current &&
+          targetNodeId
+        ) {
+          setData(nodes, [
+            ...edges,
+            {
+              id: nanoid(),
+              source: connectingNodeId.current,
+              target: targetNodeId,
+            },
+          ]);
+        }
       }
     },
     [getChildNodePosition]
@@ -271,6 +290,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
       connectionLineType={ConnectionLineType.Straight}
       fitView
       onNodeClick={(event, node) => {
+        console.log('onNodeClick', node);
         setSelectedNode(node);
       }}
     >
@@ -336,6 +356,10 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                 <MenubarItem onClick={() => setOpenSaveDialog(true)}>
                   Save as new file
                 </MenubarItem>
+                <MenubarItem onClick={() => {}} disabled={!currentFile}>
+                  Export
+                </MenubarItem>
+                <MenubarItem onClick={() => {}}>Import</MenubarItem>
               </MenubarContent>
             </MenubarMenu>
             <MenubarMenu>

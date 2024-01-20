@@ -27,6 +27,11 @@ const defaultColors = [
   { name: 'Black', value: 'hsl(0 0% 0%)' },
 ];
 
+const getRandomColor = () => {
+  const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+  return `#${randomColor}`;
+};
+
 interface DataProps {
   background?: string;
   color?: string;
@@ -50,6 +55,10 @@ export default function NodeStyleDialog({
     color: '',
   });
   const [open, setOpen] = React.useState(true);
+  const [randomColor, setRandomColor] = React.useState({
+    background: getRandomColor(),
+    color: getRandomColor(),
+  });
 
   useEffect(() => {
     if (!open) {
@@ -73,6 +82,30 @@ export default function NodeStyleDialog({
           <div>
             <div className="text-sm mb-2">Background</div>
             <div className="flex flex-wrap gap-2">
+              <Button
+                size={'sm'}
+                variant={
+                  state.background === randomColor.background
+                    ? 'default'
+                    : 'outline'
+                }
+                onClick={() => {
+                  const randomColor = getRandomColor();
+                  setRandomColor((prev) => ({
+                    ...prev,
+                    background: randomColor,
+                  }));
+                  setState({ ...state, background: randomColor });
+                }}
+              >
+                {!!randomColor.background && (
+                  <div
+                    className="h-5 w-5 rounded-full mr-1"
+                    style={{ background: randomColor.background }}
+                  ></div>
+                )}
+                Random
+              </Button>
               {defaultBackgrounds.map((color) => (
                 <Button
                   size={'sm'}
@@ -97,6 +130,28 @@ export default function NodeStyleDialog({
           <div>
             <div className="text-sm mb-2">Color</div>
             <div className="flex flex-wrap gap-2">
+              <Button
+                size={'sm'}
+                variant={
+                  state.color === randomColor.color ? 'default' : 'outline'
+                }
+                onClick={() => {
+                  const randomColor = getRandomColor();
+                  setRandomColor((prev) => ({
+                    ...prev,
+                    color: randomColor,
+                  }));
+                  setState({ ...state, color: randomColor });
+                }}
+              >
+                {!!randomColor.color && (
+                  <div
+                    className="h-5 w-5 rounded-full mr-1"
+                    style={{ background: randomColor.color }}
+                  ></div>
+                )}
+                Random
+              </Button>
               {defaultColors.map((color) => (
                 <Button
                   size={'sm'}
