@@ -384,7 +384,7 @@ const Mindmap = ({ isFullScreen }: MindmapProps) => {
                   Show flashcards
                 </MenubarItem>
                 <MenubarSeparator />
-                <MenubarItem>Find</MenubarItem>
+                <MenubarItem>Search</MenubarItem>
               </MenubarContent>
             </MenubarMenu>
             <MenubarMenu>
