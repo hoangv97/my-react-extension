@@ -7,6 +7,7 @@ import {
 } from './notion';
 
 const database_id = 'b34b292f67134f01b7b4f05ad848a423';
+const SAVED_BOOKS_KEY = '____saved_books';
 const BOOKS_KEY = '____books';
 const ERROR_BOOKS_KEY = '____error_books';
 const clickButtonTimeoutInReaderPage = 3000;
@@ -29,6 +30,12 @@ const clearCurrentBookLinkFromLocalStorage = () => {
   const storedBooks = getLocalStorage(BOOKS_KEY) || [];
   const newBooks = storedBooks.filter((b) => b !== currentBookLink);
   setLocalStorage(BOOKS_KEY, newBooks);
+
+  const savedBooks = getLocalStorage(SAVED_BOOKS_KEY) || [];
+  if (!savedBooks.includes(currentBookLink)) {
+    savedBooks.push(currentBookLink);
+    setLocalStorage(SAVED_BOOKS_KEY, savedBooks);
+  }
 };
 const popBookLinkFromLocalStorage = () => {
   const storedBooks = getLocalStorage(BOOKS_KEY) || [];
@@ -44,9 +51,11 @@ const saveBookLinksInPage = () => {
   const books = document.querySelectorAll(`a[href*='/en/app/books/']`);
   const bookLinks = Array.from(books).map((b) => b.href);
   const storedBooks = getLocalStorage(BOOKS_KEY) || [];
+  const savedBooks = getLocalStorage(SAVED_BOOKS_KEY) || [];
   const newBooks = bookLinks
     .map(getBookLinkPath)
-    .filter((b) => !storedBooks.includes(b));
+    .filter((b) => !storedBooks.includes(b))
+    .filter((b) => !savedBooks.includes(b));
   if (newBooks.length) {
     newBooks.forEach((b) => {
       storedBooks.push(b);
@@ -55,7 +64,7 @@ const saveBookLinksInPage = () => {
   }
 };
 const findPage = async (title, author) => {
-  const results = await queryDatabase(database_id, {
+  const { results } = await queryDatabase(database_id, {
     and: [
       {
         property: 'Title',
@@ -74,7 +83,34 @@ const findPage = async (title, author) => {
   return results;
 };
 
-export const handleExplorePage = () => {
+export const handleExplorePage = async () => {
+  // update saved books from notion
+  let start_cursor = undefined;
+  const savedBooks = getLocalStorage(SAVED_BOOKS_KEY) || [];
+  do {
+    const { results, next_cursor } = await queryDatabase(
+      database_id,
+      undefined,
+      undefined,
+      start_cursor
+    );
+    start_cursor = next_cursor;
+    const books = results.map((r) => getBookLinkPath(r.properties.URL.url));
+    books.forEach((b) => {
+      if (!savedBooks.includes(b)) {
+        savedBooks.push(b);
+      }
+    });
+  } while (start_cursor);
+  setLocalStorage(SAVED_BOOKS_KEY, savedBooks);
+  console.log('Saved books:', savedBooks);
+
+  // update books from saved books
+  const storedBooks = getLocalStorage(BOOKS_KEY) || [];
+  const newBooks = storedBooks.filter((b) => !savedBooks.includes(b));
+  setLocalStorage(BOOKS_KEY, newBooks);
+  console.log('New books:', newBooks);
+
   const categories = document.querySelectorAll(`a[href*='/en/app/categories']`);
   const p = prompt(
     `${Array.from(categories)

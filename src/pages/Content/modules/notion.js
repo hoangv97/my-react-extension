@@ -23,7 +23,13 @@ const fetchApiWithRetry = async (url, options, retries = 3) => {
   }
 };
 
-export const queryDatabase = async (database_id, filter) => {
+export const queryDatabase = async (
+  database_id,
+  filter = undefined,
+  sorts = undefined,
+  start_cursor = undefined,
+  page_size = 100
+) => {
   const response = await fetchApiWithRetry(
     `${notionApi}/databases/${database_id}/query`,
     {
@@ -31,10 +37,13 @@ export const queryDatabase = async (database_id, filter) => {
       method: 'POST',
       body: JSON.stringify({
         filter,
+        sorts,
+        start_cursor,
+        page_size,
       }),
     }
   );
-  const { results } = await response.json();
+  const results = await response.json();
   return results;
 };
 
