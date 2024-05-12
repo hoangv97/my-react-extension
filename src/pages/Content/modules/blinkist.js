@@ -9,7 +9,6 @@ import {
 const database_id = 'b34b292f67134f01b7b4f05ad848a423';
 const SAVED_BOOKS_KEY = '____saved_books';
 const BOOKS_KEY = '____books';
-const ERROR_BOOKS_KEY = '____error_books';
 const clickButtonTimeoutInReaderPage = 3000;
 
 const sleep = (m) => new Promise((r) => setTimeout(r, m));
@@ -25,12 +24,8 @@ const getBookLinkPath = (bookLink) => {
   const arr = bookLink.split('/');
   return arr[arr.length - 1];
 };
-const clearCurrentBookLinkFromLocalStorage = () => {
+const setCurrentBookLinkAsSaved = () => {
   const currentBookLink = getBookLinkPath(window.location.href);
-  const storedBooks = getLocalStorage(BOOKS_KEY) || [];
-  const newBooks = storedBooks.filter((b) => b !== currentBookLink);
-  setLocalStorage(BOOKS_KEY, newBooks);
-
   const savedBooks = getLocalStorage(SAVED_BOOKS_KEY) || [];
   if (!savedBooks.includes(currentBookLink)) {
     savedBooks.push(currentBookLink);
@@ -45,6 +40,11 @@ const popBookLinkFromLocalStorage = () => {
   }
   // get random book link
   const bookLink = storedBooks[Math.floor(Math.random() * storedBooks.length)];
+
+  // remove book link from stored books
+  const newBooks = storedBooks.filter((b) => b !== bookLink);
+  setLocalStorage(BOOKS_KEY, newBooks);
+
   window.location.href = `https://www.blinkist.com/en/app/books/${bookLink}`;
 };
 const saveBookLinksInPage = () => {
@@ -227,7 +227,7 @@ export const handleReaderPage = async () => {
     currentChildren = await getBlockChildren(page.id);
     if (currentChildren.length) {
       console.log('-----------> Page already has content', title, author);
-      clearCurrentBookLinkFromLocalStorage();
+      setCurrentBookLinkAsSaved();
       popBookLinkFromLocalStorage();
       return;
     }
@@ -267,12 +267,10 @@ export const handleReaderPage = async () => {
   await getContent();
 
   if (!data.length) {
-    // save to error log
-    const errorBooks = getLocalStorage(ERROR_BOOKS_KEY) || [];
-    if (!errorBooks.includes(window.location.href)) {
-      errorBooks.push(window.location.href);
-      setLocalStorage(ERROR_BOOKS_KEY, errorBooks);
-    }
+    // push back to the end of the queue
+    const storedBooks = getLocalStorage(BOOKS_KEY) || [];
+    storedBooks.push(getBookLinkPath(window.location.href));
+    setLocalStorage(BOOKS_KEY, storedBooks);
   } else {
     const children = data
       .map((d) =>
@@ -365,7 +363,7 @@ export const handleReaderPage = async () => {
       }
     }
 
-    clearCurrentBookLinkFromLocalStorage();
+    setCurrentBookLinkAsSaved();
   }
 
   popBookLinkFromLocalStorage();
