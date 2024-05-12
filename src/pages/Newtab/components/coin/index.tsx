@@ -1,4 +1,5 @@
 import Window from '@/components/common/window';
+import { Separator } from '@/components/ui/separator';
 import storage from '@/lib/storage';
 import { useWindowState } from '@/pages/Newtab/hooks/useWindowState';
 import axios from 'axios';
@@ -81,8 +82,19 @@ const Coin = () => {
                     ? 'text-green-500 dark:text-green-500'
                     : 'text-red-500 dark:text-red-500'
                 } text-xs`}
+                title="24h change"
               >
                 {Math.abs(coin.quote.USD.percent_change_24h).toFixed(2)}%
+              </div>
+              <div
+                className={`${
+                  coin.quote.USD.percent_change_7d > 0
+                    ? 'text-green-500 dark:text-green-500'
+                    : 'text-red-500 dark:text-red-500'
+                } text-xs`}
+                title="7d change"
+              >
+                {Math.abs(coin.quote.USD.percent_change_7d).toFixed(2)}%
               </div>
             </a>
           </div>

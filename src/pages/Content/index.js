@@ -1,10 +1,10 @@
-import { printLine } from './modules/print';
+import {
+  handleBookPage,
+  handleCategoryPage,
+  handleExplorePage,
+  handleReaderPage,
+} from './modules/blinkist';
 import secrets from 'secrets';
-
-console.log('Content script works!');
-console.log('Must reload extension for modifications to take effect.');
-
-printLine("Using the 'printLine' function from the Print Module");
 
 // Block websites
 const blockWebsites = secrets.BLOCK_WEBSITES;
@@ -20,5 +20,20 @@ if (blockWebsites && blockWebsites.length) {
         ];
       window.location.href = randomRedirectUrl;
     }
+  }
+}
+
+// Crawl Blinkist
+if (window.location.href.includes('blinkist.com')) {
+  const href = window.location.href;
+
+  if (href.endsWith('/app/explore')) {
+    setTimeout(handleExplorePage, 3000);
+  } else if (href.includes('/en/app/categories/')) {
+    setTimeout(handleCategoryPage, 5000);
+  } else if (href.includes('/en/app/books/')) {
+    setTimeout(handleBookPage, 5000);
+  } else if (href.includes('/en/nc/reader/')) {
+    setTimeout(handleReaderPage, 10000);
   }
 }
