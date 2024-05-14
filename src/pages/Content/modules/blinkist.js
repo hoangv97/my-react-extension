@@ -5,21 +5,13 @@ import {
   appendBlockChildren,
   getBlockChildren,
 } from './notion';
+import { getLocalStorage, setLocalStorage, sleep } from './utils';
 
-const database_id = 'b34b292f67134f01b7b4f05ad848a423';
+export const database_id = 'b34b292f67134f01b7b4f05ad848a423';
 const SAVED_BOOKS_KEY = '____saved_books';
 const BOOKS_KEY = '____books';
 const clickButtonTimeoutInReaderPage = 3000;
 
-const sleep = (m) => new Promise((r) => setTimeout(r, m));
-
-const getLocalStorage = (key) => {
-  const value = localStorage.getItem(key);
-  return value ? JSON.parse(value) : null;
-};
-const setLocalStorage = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
 const getBookLinkPath = (bookLink) => {
   const arr = bookLink.split('/');
   return arr[arr.length - 1];
@@ -193,7 +185,7 @@ export const handleBookPage = async () => {
   const pages = await findPage(title, author);
   if (pages.length === 0) {
     console.log('-----------> Creating new page', title, author);
-    await createPage(database_id, properties, []);
+    await createPage({ database_id }, properties, []);
   } else {
     const page = pages[0];
     console.log('-----------> Updating existing page', title, author);
@@ -326,7 +318,7 @@ export const handleReaderPage = async () => {
     if (pages.length === 0) {
       console.log('-----------> Creating new page', title, author);
       await createPage(
-        database_id,
+        { database_id },
         {
           Title: {
             title: [

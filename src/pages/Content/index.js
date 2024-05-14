@@ -1,10 +1,12 @@
+import secrets from 'secrets';
 import {
   handleBookPage,
   handleCategoryPage,
   handleExplorePage,
   handleReaderPage,
 } from './modules/blinkist';
-import secrets from 'secrets';
+import { handleSearchGoodreads } from './modules/google';
+import { handleBookShowPage } from './modules/goodreads';
 
 // Block websites
 const blockWebsites = secrets.BLOCK_WEBSITES;
@@ -23,17 +25,28 @@ if (blockWebsites && blockWebsites.length) {
   }
 }
 
-// Crawl Blinkist
-if (window.location.href.includes('blinkist.com')) {
-  const href = window.location.href;
+const crawlerOn = true;
 
-  if (href.endsWith('/app/explore')) {
-    setTimeout(handleExplorePage, 3000);
-  } else if (href.includes('/en/app/categories/')) {
-    setTimeout(handleCategoryPage, 5000);
-  } else if (href.includes('/en/app/books/')) {
-    setTimeout(handleBookPage, 5000);
-  } else if (href.includes('/en/nc/reader/')) {
-    setTimeout(handleReaderPage, 10000);
+if (crawlerOn) {
+  // Crawl Blinkist
+  if (window.location.href.includes('blinkist.com')) {
+    const href = window.location.href;
+
+    if (href.endsWith('/app/explore')) {
+      setTimeout(handleExplorePage, 3000);
+    } else if (href.includes('/en/app/categories/')) {
+      setTimeout(handleCategoryPage, 5000);
+    } else if (href.includes('/en/app/books/')) {
+      setTimeout(handleBookPage, 5000);
+    } else if (href.includes('/en/nc/reader/')) {
+      setTimeout(handleReaderPage, 10000);
+    }
+  } else if (window.location.href.includes('google.com/search')) {
+    setTimeout(handleSearchGoodreads, 1500);
+  } else if (
+    window.location.href.includes('goodreads.com/book/show') ||
+    window.location.href.includes('goodreads.com/en/book/show')
+  ) {
+    setTimeout(handleBookShowPage, 2000);
   }
 }
