@@ -39,8 +39,7 @@ export const getGoodreadsBooks = async (pFilter = []) => {
 };
 
 export const handleSearchGoodreads = async () => {
-  return;
-  // get books with error
+  // get books with no goodreads link
   const { results } = await queryDatabase(database_id, {
     and: [
       {
@@ -49,15 +48,18 @@ export const handleSearchGoodreads = async () => {
           is_empty: true,
         },
       },
-      {
-        property: 'Error',
-        checkbox: {
-          equals: true,
-        },
-      },
+      // {
+      //   property: 'Error',
+      //   checkbox: {
+      //     equals: true,
+      //   },
+      // },
     ],
   });
-  console.log('------------> Books with error', results);
+  console.log('------------> Books', results);
+  if (!results.length) {
+    return;
+  }
 
   // get books with no goodreads link
   let books = results.map((b) => ({

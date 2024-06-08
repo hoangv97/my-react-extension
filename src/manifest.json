@@ -19,7 +19,7 @@
       "matches": ["http://*/*", "https://*/*", "<all_urls>"],
       "js": ["contentScript.bundle.js"],
       "css": ["content.styles.css"],
-      "run_at": "document_end"
+      "run_at": "document_idle"
     }
   ],
   "devtools_page": "devtools.html",

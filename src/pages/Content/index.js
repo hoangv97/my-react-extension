@@ -2,11 +2,20 @@ import secrets from 'secrets';
 import {
   handleBookPage,
   handleCategoryPage,
+  handleCollections,
   handleExplorePage,
   handleReaderPage,
 } from './modules/blinkist';
 import { handleSearchGoodreads } from './modules/google';
 import { handleBookShowPage } from './modules/goodreads';
+
+window.addEventListener('load', () => {
+  console.log('--------------------Document loaded');
+
+  chrome.storage.sync.get('userConfig', (data) => {
+    console.log('User config:', data.userConfig);
+  });
+});
 
 // Block websites
 const blockWebsites = secrets.BLOCK_WEBSITES;
@@ -29,23 +38,29 @@ const crawlerOn = true;
 
 if (crawlerOn) {
   // Crawl Blinkist
-  if (window.location.href.includes('blinkist.com')) {
-    const href = window.location.href;
+  const href = window.location.href;
+  // get params
+  const url = new URL(href);
+  const searchParams = new URLSearchParams(url.search);
 
-    if (href.endsWith('/app/explore')) {
+  if (href.includes('blinkist.com')) {
+    if (href.endsWith('/app/explore') || href.endsWith('/app/for-you')) {
       setTimeout(handleExplorePage, 3000);
     } else if (href.includes('/en/app/categories/')) {
-      setTimeout(handleCategoryPage, 5000);
+      setTimeout(handleExplorePage, 3000);
+      // setTimeout(handleCategoryPage, 5000);
+    } else if (href.includes('/en/app/collections/')) {
+      setTimeout(handleCollections, 5000);
     } else if (href.includes('/en/app/books/')) {
       setTimeout(handleBookPage, 5000);
     } else if (href.includes('/en/nc/reader/')) {
       setTimeout(handleReaderPage, 10000);
     }
-  } else if (window.location.href.includes('google.com/search')) {
+  } else if (href.includes('google.com/search')) {
     setTimeout(handleSearchGoodreads, 1500);
   } else if (
-    window.location.href.includes('goodreads.com/book/show') ||
-    window.location.href.includes('goodreads.com/en/book/show')
+    href.includes('goodreads.com/book/show') ||
+    href.includes('goodreads.com/en/book/show')
   ) {
     setTimeout(handleBookShowPage, 2000);
   }

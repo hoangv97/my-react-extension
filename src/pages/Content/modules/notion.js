@@ -93,11 +93,11 @@ export const updatePage = async (
 };
 
 export const getBlockChildren = async (block_id) => {
-  const { results } = await fetchApiWithRetry(
+  const result = await fetchApiWithRetry(
     `${notionApi}/blocks/${block_id}/children`,
     {
       headers,
     }
   );
-  return results;
+  return result;
 };

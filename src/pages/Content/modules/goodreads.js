@@ -115,7 +115,7 @@ export const handleBookShowPage = async () => {
   }
 
   // go to the next page
-  const result = await queryDatabase(
+  const { results } = await queryDatabase(
     database_id,
     {
       and: [
@@ -131,27 +131,26 @@ export const handleBookShowPage = async () => {
             is_not_empty: true,
           },
         },
-        {
-          property: 'Error',
-          checkbox: {
-            equals: true,
-          },
-        },
+        // {
+        //   property: 'Error',
+        //   checkbox: {
+        //     equals: true,
+        //   },
+        // },
       ],
     },
     [{ property: 'Last edited time', direction: 'descending' }]
   );
-  const books = result.results.map((b) => ({
-    ...b,
-    _q: `${b.properties.Title.title[0].text.content} ${b.properties.Author.rich_text[0].text.content} site:goodreads.com`,
-  }));
-
-  // to goodreads url
-  // get random book
-  const book = books[Math.floor(Math.random() * books.length)];
-  if (book) {
-    await sleep(4000);
-    window.location.href = book.properties['Goodreads URL'].url;
+  const books = results;
+  if (books.length) {
+    // to goodreads url
+    const book = books[Math.floor(Math.random() * books.length)];
+    if (book) {
+      await sleep(1000);
+      window.location.href = book.properties['Goodreads URL'].url;
+    }
+  } else {
+    console.log('------------> No more books to search');
   }
   return;
 
