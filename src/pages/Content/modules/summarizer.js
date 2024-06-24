@@ -1,13 +1,39 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from '@google/generative-ai';
 import secrets from 'secrets';
 import OpenAI from 'openai';
 import { sleep } from './utils';
 
 const geminiModel = 'gemini-1.5-pro';
 
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_NONE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_NONE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_NONE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_NONE,
+  },
+];
+
 export const countPromptTokens = async (prompt) => {
   const genAI = new GoogleGenerativeAI(secrets.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: geminiModel });
+  const model = genAI.getGenerativeModel({
+    model: geminiModel,
+    safetySettings,
+  });
   try {
     const response = await model.countTokens(prompt);
     return response;
@@ -24,7 +50,10 @@ export const countPromptTokens = async (prompt) => {
 export const generateContent = async (prompt) => {
   const genAI = new GoogleGenerativeAI(secrets.GEMINI_API_KEY);
 
-  const model = genAI.getGenerativeModel({ model: geminiModel });
+  const model = genAI.getGenerativeModel({
+    model: geminiModel,
+    safetySettings,
+  });
 
   const openai = new OpenAI({
     apiKey: secrets.OPENAI_API_KEY,
