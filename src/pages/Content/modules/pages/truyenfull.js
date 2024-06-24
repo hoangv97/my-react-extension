@@ -221,7 +221,7 @@ export const handleChapterPage = async () => {
               ),
             },
           },
-          {
+          ...splitParagraphs(currentChaptersSummary).map((c) => ({
             object: 'block',
             type: 'paragraph',
             paragraph: {
@@ -229,12 +229,12 @@ export const handleChapterPage = async () => {
                 {
                   type: 'text',
                   text: {
-                    content: currentChaptersSummary,
+                    content: c,
                   },
                 },
               ],
             },
-          },
+          })),
         ]
       );
       if (currentChaptersSummaryPage.status === 400) {
