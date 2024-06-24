@@ -1,12 +1,7 @@
+import { queryDatabase, updatePage } from '../notion';
+import { convertDateString, sleep } from '../utils';
 import { database_id } from './blinkist';
-import { getGoodreadsBooks, getGoogleSearch } from './google';
-import { queryDatabase, updatePage } from './notion';
-import {
-  convertDateString,
-  getLocalStorage,
-  setLocalStorage,
-  sleep,
-} from './utils';
+import { getGoogleSearch } from './google';
 
 const saveNoResultBook = async (book) => {
   await updatePage(book.id, {
@@ -74,9 +69,9 @@ export const handleBookShowPage = async () => {
         'GReviews Count': {
           number: parseInt(reviewsCount),
         },
-        Error: {
-          checkbox: false,
-        },
+        // Error: {
+        //   checkbox: false,
+        // },
       };
       if (publishDate) {
         properties['Publish date'] = {

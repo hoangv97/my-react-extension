@@ -9,6 +9,29 @@ const headers = {
   'Notion-Version': '2022-06-28',
 };
 
+export const createDatabase = async (pageId, title, properties) => {
+  const result = await fetchApiWithRetry(`${notionApi}/databases`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      parent: {
+        type: 'page_id',
+        page_id: pageId,
+      },
+      title: [
+        {
+          type: 'text',
+          text: {
+            content: title,
+          },
+        },
+      ],
+      properties,
+    }),
+  });
+  return result;
+};
+
 export const queryDatabase = async (
   database_id,
   filter = undefined,
@@ -39,17 +62,24 @@ export const createPage = async (
   icon = undefined,
   cover = undefined
 ) => {
+  // if children length is more than 100, split into multiple requests
+  const firstChunk = children.slice(0, 100);
   const result = await fetchApiWithRetry(`${notionApi}/pages`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
       parent,
       properties,
-      children,
+      children: firstChunk,
       icon,
       cover,
     }),
   });
+  if (children.length > 100) {
+    // append block each 100 children
+    const restChunks = children.slice(100);
+    await appendBlockChildren(result.id, restChunks);
+  }
   return result;
 };
 
@@ -100,4 +130,28 @@ export const getBlockChildren = async (block_id) => {
     }
   );
   return result;
+};
+
+export const getAllBlockChildren = async (block_id) => {
+  let blockChildren = [];
+  let next_cursor = undefined;
+  do {
+    // encoding params
+    const params = new URLSearchParams();
+    if (next_cursor) {
+      params.append('start_cursor', next_cursor);
+    }
+    params.append('page_size', 100);
+    const result = await fetchApiWithRetry(
+      `${notionApi}/blocks/${block_id}/children?${encodeURIComponent(
+        params.toString()
+      )}`,
+      {
+        headers,
+      }
+    );
+    blockChildren = blockChildren.concat(result.results);
+    next_cursor = result.next_cursor;
+  } while (next_cursor);
+  return blockChildren;
 };

@@ -5,9 +5,10 @@ import {
   handleCollections,
   handleExplorePage,
   handleReaderPage,
-} from './modules/blinkist';
-import { handleSearchGoodreads } from './modules/google';
-import { handleBookShowPage } from './modules/goodreads';
+} from './modules/pages/blinkist';
+import { handleSearchGoodreads } from './modules/pages/google';
+import { handleBookShowPage } from './modules/pages/goodreads';
+import { handleChapterPage } from './modules/pages/truyenfull';
 
 window.addEventListener('load', () => {
   console.log('--------------------Document loaded');
@@ -63,5 +64,7 @@ if (crawlerOn) {
     href.includes('goodreads.com/en/book/show')
   ) {
     setTimeout(handleBookShowPage, 2000);
+  } else if (href.includes('truyenfull.vn') && href.includes('/chuong-')) {
+    setTimeout(handleChapterPage, 2000);
   }
 }

@@ -1,8 +1,8 @@
-import { fetchApiWithRetry } from './api';
 import secrets from 'secrets';
-import { queryDatabase, updatePage } from './notion';
+import { fetchApiWithRetry } from '../api';
+import { queryDatabase, updatePage } from '../notion';
+import { sleep } from '../utils';
 import { database_id } from './blinkist';
-import { getLocalStorage, setLocalStorage, sleep } from './utils';
 
 const googleApi = `https://customsearch.googleapis.com/customsearch/v1`;
 

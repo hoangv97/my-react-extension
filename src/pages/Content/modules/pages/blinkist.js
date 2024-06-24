@@ -4,8 +4,8 @@ import {
   updatePage,
   appendBlockChildren,
   getBlockChildren,
-} from './notion';
-import { getLocalStorage, setLocalStorage, sleep } from './utils';
+} from '../notion';
+import { getLocalStorage, setLocalStorage, sleep } from '../utils';
 
 export const database_id = 'b34b292f67134f01b7b4f05ad848a423';
 export const collection_database_id = '747905a05c124de9bfe9d1627f741703';
