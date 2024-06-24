@@ -9,22 +9,32 @@ import {
   getAllBlockChildren,
   getBlockChildren,
   queryDatabase,
+  splitParagraphs,
 } from '../notion';
 
 export const handleChapterPage = async () => {
   // Config
   const maxTokens = 5000;
   const autoNextPage = true;
+  const summaryChapterSummariesOutputSentencesNum = 20;
+  const summaryChapterOutputSentencesNum = 5;
 
   // parse data from current page
-  document.querySelectorAll('#chapter-c > div').forEach((e) => e.remove());
-  document.querySelectorAll('#chapter-c > a').forEach((e) => e.remove());
+  document.querySelectorAll('#chapter-c div').forEach((e) => e.remove());
+  document.querySelectorAll('#chapter-c a').forEach((e) => e.remove());
   const innerHtml = document.querySelector('#chapter-c').innerHTML;
   const chapterContent = innerHtml
     .replace(/<br>/g, '\n')
-    .replace(/<[^>]*>/g, '');
+    .replace(/<[^>]*>/g, '\n')
+    .replace(/\n+/g, '\n')
+    .trim();
   const chapterTitle = document.querySelector('.chapter-title').textContent;
   const novelTitle = document.querySelector('.truyen-title').textContent;
+  console.log({
+    chapterTitle,
+    novelTitle,
+    chapterContent,
+  });
 
   // get notion pages
   const mainNotionPageId = '6d6b78342de0426c9af57ba2b065b2ea';
@@ -37,6 +47,9 @@ export const handleChapterPage = async () => {
     database = await createDatabase(mainNotionPageId, novelTitle, {
       Name: {
         title: {},
+      },
+      URL: {
+        url: {},
       },
       'Last edited time': {
         last_edited_time: {},
@@ -67,6 +80,16 @@ export const handleChapterPage = async () => {
     const { id, properties } = chapter;
     const name = properties.Name.title[0].text.content;
 
+    if (name.endsWith(chapterTitle)) {
+      console.log('Chapter already exists:', name);
+
+      // move to next chapter
+      if (autoNextPage) {
+        document.querySelector('#next_chap').click();
+        return;
+      }
+    }
+
     if (i === 0) {
       // get number of current chapter from name C1 - Chapter 1
       const match = name.match(/C(\d+)/);
@@ -89,11 +112,13 @@ export const handleChapterPage = async () => {
         // continue;
         break; // don't need to read content
       }
-      const content = child[child.type].rich_text[0].text.content;
-      if (isChapterContentBlock) {
-        chapterContent.push(content);
-      } else {
-        chapterSummary.push(content);
+      if (child.type === 'paragraph') {
+        const content = child[child.type].rich_text[0].text.content;
+        if (isChapterContentBlock) {
+          chapterContent.push(content);
+        } else {
+          chapterSummary.push(content);
+        }
       }
     }
     currentChapters.push({
@@ -126,10 +151,13 @@ export const handleChapterPage = async () => {
     );
 
     if (currentChaptersSummaryTokens > maxTokens) {
-      currentChaptersSummary = await summaryChapterSummaries(
+      const summaryChapterSummariesResponse = await summaryChapterSummaries(
         currentChaptersSummary,
-        20
+        summaryChapterSummariesOutputSentencesNum
       );
+      currentChaptersSummary = summaryChapterSummariesResponse.result;
+      const summaryChapterSummariesPrompt =
+        summaryChapterSummariesResponse.prompt;
       console.log('New chapters summary:', currentChaptersSummary);
 
       // get number from last chapter name
@@ -165,6 +193,36 @@ export const handleChapterPage = async () => {
         [
           {
             object: 'block',
+            type: 'toggle',
+            toggle: {
+              rich_text: [
+                {
+                  type: 'text',
+                  text: {
+                    content: 'Prompt',
+                  },
+                },
+              ],
+              children: splitParagraphs(summaryChapterSummariesPrompt).map(
+                (c) => ({
+                  object: 'block',
+                  type: 'paragraph',
+                  paragraph: {
+                    rich_text: [
+                      {
+                        type: 'text',
+                        text: {
+                          content: c,
+                        },
+                      },
+                    ],
+                  },
+                })
+              ),
+            },
+          },
+          {
+            object: 'block',
             type: 'paragraph',
             paragraph: {
               rich_text: [
@@ -179,15 +237,25 @@ export const handleChapterPage = async () => {
           },
         ]
       );
+      if (currentChaptersSummaryPage.status === 400) {
+        console.log('Error:', currentChaptersSummaryPage);
+        return;
+      }
       console.log('Create summary page', currentChaptersSummaryPage);
     }
   }
 
-  const chapterSummary = await summaryChapter(
+  const chapterSummaryResponse = await summaryChapter(
     chapterContent,
     currentChaptersSummary,
-    5
+    summaryChapterOutputSentencesNum
   );
+  const chapterSummary = chapterSummaryResponse.result;
+  const chapterSummaryPrompt = chapterSummaryResponse.prompt;
+
+  const truncateWord = '**Nội dung Chương:**';
+  const truncateChapterSummaryPrompt =
+    chapterSummaryPrompt.split(truncateWord)[0] + truncateWord + '\n...';
 
   // save chapter summary
   const chapterNotionPage = await createPage(
@@ -203,8 +271,39 @@ export const handleChapterPage = async () => {
           },
         ],
       },
+      URL: {
+        url: window.location.href,
+      },
     },
     [
+      {
+        object: 'block',
+        type: 'toggle',
+        toggle: {
+          rich_text: [
+            {
+              type: 'text',
+              text: {
+                content: 'Prompt',
+              },
+            },
+          ],
+          children: splitParagraphs(truncateChapterSummaryPrompt).map((c) => ({
+            object: 'block',
+            type: 'paragraph',
+            paragraph: {
+              rich_text: [
+                {
+                  type: 'text',
+                  text: {
+                    content: c,
+                  },
+                },
+              ],
+            },
+          })),
+        },
+      },
       {
         object: 'block',
         type: 'paragraph',
@@ -224,26 +323,26 @@ export const handleChapterPage = async () => {
         type: 'divider',
         divider: {},
       },
-      ...chapterContent
-        .split('\n')
-        .map((c) => c.trim())
-        .filter((c) => !!c)
-        .map((c) => ({
-          object: 'block',
-          type: 'paragraph',
-          paragraph: {
-            rich_text: [
-              {
-                type: 'text',
-                text: {
-                  content: c,
-                },
+      ...splitParagraphs(chapterContent).map((c) => ({
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [
+            {
+              type: 'text',
+              text: {
+                content: c,
               },
-            ],
-          },
-        })),
+            },
+          ],
+        },
+      })),
     ]
   );
+  if (chapterNotionPage.status === 400) {
+    console.log('Error:', chapterNotionPage);
+    return;
+  }
   console.log('Create page', chapterNotionPage);
 
   // move to next chapter

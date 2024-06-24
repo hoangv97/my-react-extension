@@ -155,3 +155,30 @@ export const getAllBlockChildren = async (block_id) => {
   } while (next_cursor);
   return blockChildren;
 };
+
+// if each paragraph splitted by new line is longer than 2000 chars, split into multiple paragraphs by dot
+export const splitParagraphs = (text) => {
+  return text
+    .split('\n')
+    .map((c) => c.trim())
+    .filter((c) => !!c)
+    .map((c) => {
+      if (c.length <= 2000) {
+        return c;
+      }
+      const sentences = c.split('.').map((s) => s.trim());
+      let current = '';
+      let result = [];
+      for (let i = 0; i < sentences.length; i++) {
+        if (current.length + sentences[i].length < 2000) {
+          current += sentences[i] + '.';
+        } else {
+          result.push(current);
+          current = sentences[i] + '.';
+        }
+      }
+      result.push(current);
+      return result;
+    })
+    .flat();
+};
