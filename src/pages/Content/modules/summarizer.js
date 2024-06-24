@@ -16,7 +16,7 @@ export const countPromptTokens = async (prompt) => {
     await sleep(Math.floor(Math.random() * 7 + 3) * 1000);
     console.log('Retry countPromptTokens', error);
 
-    const response = await model.countTokens(prompt);
+    const response = await countPromptTokens(prompt);
     return response;
   }
 };
@@ -41,9 +41,7 @@ export const generateContent = async (prompt) => {
     // try again after random time from 3 to 10 seconds
     await sleep(Math.floor(Math.random() * 7 + 3) * 1000);
     console.log('Retry generateContent', error);
-    const result = await generateContent(prompt);
-    const response = result.response;
-    const text = response.text().trim();
+    const text = await generateContent(prompt);
     return text;
   }
 };
