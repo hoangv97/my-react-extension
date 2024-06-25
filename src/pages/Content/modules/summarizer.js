@@ -63,7 +63,7 @@ export const generateContent = async (prompt) => {
   try {
     const result = await model.generateContent(prompt);
     const response = result.response;
-    const text = response.text().trim();
+    const text = response.text().trim().replaceAll('  ', ' ');
     // console.log(text);
     return text;
   } catch (error) {
