@@ -9,19 +9,23 @@ export const handleChapterPage = async () => {
     const summaryChapterOutputSentencesNum = 5;
 
     // parse data from current page
-    document.querySelectorAll('#chapter-c div').forEach((e) => e.remove());
-    document.querySelectorAll('#chapter-c a').forEach((e) => e.remove());
-    const innerHtml = document.querySelector('#chapter-c').innerHTML;
+    document
+      .querySelectorAll('#chapter-container div')
+      .forEach((e) => e.remove());
+    document
+      .querySelectorAll('#chapter-container a')
+      .forEach((e) => e.remove());
+    const innerHtml = document.querySelector('#chapter-container').innerHTML;
     const chapterContent = innerHtml
       .replace(/<br>/g, '\n')
       .replace(/<[^>]*>/g, '\n')
       .replace(/\n+/g, '\n')
       .trim();
     const chapterTitle = document.querySelector('.chapter-title').textContent;
-    const novelTitle = document.querySelector('.truyen-title').textContent;
+    const novelTitle = document.querySelector('.booktitle').textContent;
 
     const goToNextPage = () => {
-      document.querySelector('#next_chap').click();
+      document.querySelector('.nextchap').click();
     };
 
     runSummarizer(
@@ -29,7 +33,7 @@ export const handleChapterPage = async () => {
       chapterTitle,
       chapterContent,
       goToNextPage,
-      'vi',
+      'en',
       maxTokensPerPrompt,
       autoNextPage,
       summaryChapterSummariesOutputSentencesNum,
