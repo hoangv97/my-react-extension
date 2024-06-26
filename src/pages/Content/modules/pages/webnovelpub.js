@@ -1,4 +1,5 @@
 import { runSummarizer } from '../summarizer';
+import { sleep } from '../utils';
 
 export const handleChapterPage = async () => {
   try {
@@ -41,6 +42,7 @@ export const handleChapterPage = async () => {
     );
   } catch (error) {
     console.log('Retry handleChapterPage', error);
+    await sleep(15000);
     // reload page
     window.location.reload();
   }

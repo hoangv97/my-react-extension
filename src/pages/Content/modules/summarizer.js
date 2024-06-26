@@ -76,6 +76,20 @@ export const generateContent = async (prompt, retriedTimes = 0) => {
   });
 
   try {
+    if (retriedTimes >= 5) {
+      // try OpenAI
+      console.log("Try OpenAI's GPT");
+      const chatCompletion = await openai.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'gpt-4o',
+      });
+      const text = chatCompletion.choices[0].message.content?.trim();
+      // console.log(text);
+      if (!text) {
+        throw new Error('Empty response');
+      }
+      return text;
+    }
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text().trim().replaceAll('  ', ' ');
@@ -85,7 +99,7 @@ export const generateContent = async (prompt, retriedTimes = 0) => {
     // try again after random time from 3 to 10 seconds
     await sleep(Math.floor(Math.random() * 7 + 3) * 1000);
     console.log('Retry generateContent', error);
-    const text = await generateContent(prompt);
+    const text = await generateContent(prompt, retriedTimes + 1);
     return text;
   }
 };
