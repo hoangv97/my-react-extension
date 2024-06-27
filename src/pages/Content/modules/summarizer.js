@@ -3,9 +3,8 @@ import {
   HarmBlockThreshold,
   HarmCategory,
 } from '@google/generative-ai';
-import secrets from 'secrets';
 import OpenAI from 'openai';
-import { sleep } from './utils';
+import secrets from 'secrets';
 import {
   createDatabase,
   createPage,
@@ -14,6 +13,7 @@ import {
   queryDatabase,
   splitParagraphs,
 } from './notion';
+import { getLocalStorage, setLocalStorage, sleep } from './utils';
 
 const geminiModel = 'gemini-1.5-pro';
 
@@ -203,6 +203,34 @@ const getTruncateWord = (language) => {
   }
 };
 
+const getChapterSummary = async (id) => {
+  // get data from storage
+  const key = '______chapter_summaries';
+  const summaries = getLocalStorage(key) || {};
+  if (summaries[id]) {
+    console.log('Get chapter summary from storage', id, summaries[id]);
+    return summaries[id];
+  }
+
+  const { results: children } = await getBlockChildren(id);
+  const chapterSummary = [];
+  for (const child of children) {
+    const { type } = child;
+    if (child.type === 'paragraph') {
+      const content = child[child.type].rich_text[0].text.content;
+      chapterSummary.push(content);
+    } else if (type === 'divider') {
+      break;
+    }
+  }
+
+  // save to storage
+  summaries[id] = chapterSummary;
+  setLocalStorage(key, summaries);
+
+  return chapterSummary;
+};
+
 export const runSummarizer = async (
   novelTitle,
   chapterTitle,
@@ -291,31 +319,9 @@ export const runSummarizer = async (
       }
     }
 
-    // const children = await getAllBlockChildren(id);
-    const { results: children } = await getBlockChildren(id);
-    const chapterContent = [];
-    const chapterSummary = [];
-    let isChapterContentBlock = false; // summary first then content
-    for (let j = 0; j < children.length; j++) {
-      const child = children[j];
-      const { type } = child;
-      if (type === 'divider') {
-        // isChapterContentBlock = true;
-        // continue;
-        break; // don't need to read content
-      }
-      if (child.type === 'paragraph') {
-        const content = child[child.type].rich_text[0].text.content;
-        if (isChapterContentBlock) {
-          chapterContent.push(content);
-        } else {
-          chapterSummary.push(content);
-        }
-      }
-    }
+    const chapterSummary = await getChapterSummary(id);
     currentChapters.push({
       name,
-      content: chapterContent.join('\n'),
       summary: chapterSummary.join('\n'),
     });
 
