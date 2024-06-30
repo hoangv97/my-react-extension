@@ -237,7 +237,8 @@ export const runSummarizer = async (
   chapterContent,
   goToNextPage,
   language,
-  maxTokensPerPrompt,
+  maxTokensInPreviousSummaries,
+  maxTokensInChapterContent,
   autoNextPage,
   summaryChapterSummariesOutputSentencesNum,
   summaryChapterOutputSentencesNum
@@ -348,7 +349,7 @@ export const runSummarizer = async (
       currentChaptersSummaryTokens
     );
 
-    if (currentChaptersSummaryTokens > maxTokensPerPrompt) {
+    if (currentChaptersSummaryTokens > maxTokensInPreviousSummaries) {
       const summaryChapterSummariesResponse = await summaryChapterSummaries(
         language,
         currentChaptersSummary,
@@ -444,14 +445,64 @@ export const runSummarizer = async (
     }
   }
 
-  const chapterSummaryResponse = await summaryChapter(
-    language,
-    chapterContent,
-    currentChaptersSummary,
-    summaryChapterOutputSentencesNum
+  let chapterSummary;
+  let chapterSummaryPrompt;
+
+  // count tokens of chapter content
+  // if it's too long, split it into multiple parts by paragraphs
+  const { totalTokens: chapterContentTokens } = await countPromptTokens(
+    chapterContent
   );
-  const chapterSummary = chapterSummaryResponse.result;
-  const chapterSummaryPrompt = chapterSummaryResponse.prompt;
+  console.log('Chapter content tokens:', chapterContentTokens);
+  if (chapterContentTokens > maxTokensInChapterContent) {
+    // split chapter content into 2 paragraphs
+    const paragraphs = splitParagraphs(chapterContent);
+    const half = Math.ceil(paragraphs.length / 2);
+    const firstPart = paragraphs.slice(0, half).join('\n');
+    const secondPart = paragraphs.slice(half).join('\n');
+    console.log('Split chapter content:', firstPart);
+    console.log('Split chapter content:', secondPart);
+    // // count tokens of each part
+    // const { totalTokens: firstPartTokens } = await countPromptTokens(firstPart);
+    // const { totalTokens: secondPartTokens } = await countPromptTokens(
+    //   secondPart
+    // );
+    // console.log('First part tokens:', firstPartTokens);
+    // console.log('Second part tokens:', secondPartTokens);
+    const chapterSummaryResponse = await summaryChapter(
+      language,
+      firstPart,
+      currentChaptersSummary,
+      summaryChapterOutputSentencesNum
+    );
+    const chapterSummary1 = chapterSummaryResponse.result;
+    const chapterSummaryPrompt1 = chapterSummaryResponse.prompt;
+    console.log('First part summary:', chapterSummary1);
+
+    // summary second part
+    currentChaptersSummary += '\n' + chapterSummary1;
+    const chapterSummaryResponse2 = await summaryChapter(
+      language,
+      secondPart,
+      currentChaptersSummary,
+      summaryChapterOutputSentencesNum
+    );
+    const chapterSummary2 = chapterSummaryResponse2.result;
+    const chapterSummaryPrompt2 = chapterSummaryResponse2.prompt;
+    console.log('Second part summary:', chapterSummary2);
+
+    chapterSummary = chapterSummary1 + '\n' + chapterSummary2;
+    chapterSummaryPrompt = chapterSummaryPrompt2;
+  } else {
+    const chapterSummaryResponse = await summaryChapter(
+      language,
+      chapterContent,
+      currentChaptersSummary,
+      summaryChapterOutputSentencesNum
+    );
+    chapterSummary = chapterSummaryResponse.result;
+    chapterSummaryPrompt = chapterSummaryResponse.prompt;
+  }
 
   const truncateWord = getTruncateWord(language);
   const truncateChapterSummaryPrompt =

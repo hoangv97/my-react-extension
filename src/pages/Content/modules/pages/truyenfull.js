@@ -3,7 +3,8 @@ import { runSummarizer } from '../summarizer';
 export const handleChapterPage = async () => {
   try {
     // Config
-    const maxTokensPerPrompt = 5000;
+    const maxTokensInPreviousSummaries = 5000;
+    const maxTokensInChapterContent = 25000;
     const autoNextPage = true;
     const summaryChapterSummariesOutputSentencesNum = 20;
     const summaryChapterOutputSentencesNum = 5;
@@ -30,7 +31,8 @@ export const handleChapterPage = async () => {
       chapterContent,
       goToNextPage,
       'vi',
-      maxTokensPerPrompt,
+      maxTokensInPreviousSummaries,
+      maxTokensInChapterContent,
       autoNextPage,
       summaryChapterSummariesOutputSentencesNum,
       summaryChapterOutputSentencesNum

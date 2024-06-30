@@ -156,7 +156,8 @@ export const getAllBlockChildren = async (block_id) => {
   return blockChildren;
 };
 
-// if each paragraph splitted by new line is longer than 2000 chars, split into multiple paragraphs by dot
+// if each paragraph splitted by new line
+// if longer than 2000 chars, split into multiple paragraphs by dot
 export const splitParagraphs = (text) => {
   return text
     .split('\n')
