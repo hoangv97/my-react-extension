@@ -159,26 +159,40 @@ export const getAllBlockChildren = async (block_id) => {
 // if each paragraph splitted by new line
 // if longer than 2000 chars, split into multiple paragraphs by dot
 export const splitParagraphs = (text) => {
+  const maxChars = 2000;
   return text
     .split('\n')
     .map((c) => c.trim())
     .filter((c) => !!c)
     .map((c) => {
-      if (c.length <= 2000) {
+      if (c.length <= maxChars) {
         return c;
       }
       const sentences = c.split('.').map((s) => s.trim());
       let current = '';
       let result = [];
       for (let i = 0; i < sentences.length; i++) {
-        if (current.length + sentences[i].length < 2000) {
+        if (current.length + sentences[i].length < maxChars) {
           current += sentences[i] + '.';
         } else {
-          result.push(current);
+          if (current.length > maxChars) {
+            // split into 2 paragraphs
+            result.push(current.slice(0, maxChars));
+            result.push(current.slice(maxChars));
+          } else {
+            result.push(current);
+          }
+
           current = sentences[i] + '.';
         }
       }
-      result.push(current);
+      if (current.length > maxChars) {
+        // split into 2 paragraphs
+        result.push(current.slice(0, maxChars));
+        result.push(current.slice(maxChars));
+      } else {
+        result.push(current);
+      }
       return result;
     })
     .flat();

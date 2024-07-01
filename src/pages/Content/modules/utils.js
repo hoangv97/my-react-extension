@@ -9,6 +9,10 @@ export const setLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
+export const removeLocalStorage = (key) => {
+  localStorage.removeItem(key);
+};
+
 export const convertDateString = (input) => {
   if (!input) {
     return null;

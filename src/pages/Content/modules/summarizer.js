@@ -13,7 +13,12 @@ import {
   queryDatabase,
   splitParagraphs,
 } from './notion';
-import { getLocalStorage, setLocalStorage, sleep } from './utils';
+import {
+  getLocalStorage,
+  setLocalStorage,
+  removeLocalStorage,
+  sleep,
+} from './utils';
 
 const geminiModel = 'gemini-1.5-pro';
 
@@ -207,6 +212,13 @@ const getChapterSummary = async (id) => {
   // get data from storage
   const key = '______chapter_summaries';
   const summaries = getLocalStorage(key) || {};
+
+  if (Object.keys(summaries).length > 100) {
+    // clear storage
+    console.log('Clear chapter summaries storage');
+    removeLocalStorage(key);
+  }
+
   if (summaries[id]) {
     console.log('Get chapter summary from storage', id, summaries[id]);
     return summaries[id];
@@ -403,8 +415,9 @@ export const runSummarizer = async (
                   },
                 },
               ],
-              children: splitParagraphs(summaryChapterSummariesPrompt).map(
-                (c) => ({
+              children: splitParagraphs(summaryChapterSummariesPrompt)
+                .slice(0, 100)
+                .map((c) => ({
                   object: 'block',
                   type: 'paragraph',
                   paragraph: {
@@ -417,8 +430,7 @@ export const runSummarizer = async (
                       },
                     ],
                   },
-                })
-              ),
+                })),
             },
           },
           ...splitParagraphs(currentChaptersSummary).map((c) => ({
@@ -539,20 +551,22 @@ export const runSummarizer = async (
               },
             },
           ],
-          children: splitParagraphs(truncateChapterSummaryPrompt).map((c) => ({
-            object: 'block',
-            type: 'paragraph',
-            paragraph: {
-              rich_text: [
-                {
-                  type: 'text',
-                  text: {
-                    content: c,
+          children: splitParagraphs(truncateChapterSummaryPrompt)
+            .slice(0, 100)
+            .map((c) => ({
+              object: 'block',
+              type: 'paragraph',
+              paragraph: {
+                rich_text: [
+                  {
+                    type: 'text',
+                    text: {
+                      content: c,
+                    },
                   },
-                },
-              ],
-            },
-          })),
+                ],
+              },
+            })),
         },
       },
       ...splitParagraphs(chapterSummary).map((c) => ({
