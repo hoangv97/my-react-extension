@@ -65,7 +65,7 @@ if (crawlerOn) {
     href.includes('goodreads.com/en/book/show')
   ) {
     setTimeout(handleBookShowPage, 2000);
-  } else if (href.includes('truyenfull.vn') && href.includes('/chuong-')) {
+  } else if (href.includes('truyenfull.vn') && href.includes('chuong-')) {
     setTimeout(handleChapterPageTruyenfull, 2000);
   } else if (href.includes('webnovelpub.pro') && href.includes('/chapter-')) {
     setTimeout(handleChapterPageWebnovelpub, 2000);
