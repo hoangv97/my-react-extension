@@ -81,20 +81,20 @@ export const generateContent = async (prompt, retriedTimes = 0) => {
   });
 
   try {
-    if (retriedTimes >= 5) {
-      // try OpenAI
-      console.log("Try OpenAI's GPT");
-      const chatCompletion = await openai.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'gpt-4o',
-      });
-      const text = chatCompletion.choices[0].message.content?.trim();
-      // console.log(text);
-      if (!text) {
-        throw new Error('Empty response');
-      }
-      return text;
-    }
+    // if (retriedTimes >= 5 && retriedTimes < 7) {
+    //   // try OpenAI
+    //   console.log("Try OpenAI's GPT");
+    //   const chatCompletion = await openai.chat.completions.create({
+    //     messages: [{ role: 'user', content: prompt }],
+    //     model: 'gpt-4o',
+    //   });
+    //   const text = chatCompletion.choices[0].message.content?.trim();
+    //   // console.log(text);
+    //   if (!text) {
+    //     throw new Error('Empty response');
+    //   }
+    //   return text;
+    // }
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text().trim().replaceAll('  ', ' ');

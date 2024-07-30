@@ -58,7 +58,7 @@ export const queryDatabase = async (
 export const createPage = async (
   parent,
   properties,
-  children,
+  children = [],
   icon = undefined,
   cover = undefined
 ) => {

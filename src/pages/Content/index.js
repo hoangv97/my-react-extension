@@ -10,6 +10,7 @@ import { handleSearchGoodreads } from './modules/pages/google';
 import { handleBookShowPage } from './modules/pages/goodreads';
 import { handleChapterPage as handleChapterPageTruyenfull } from './modules/pages/truyenfull';
 import { handleChapterPage as handleChapterPageWebnovelpub } from './modules/pages/webnovelpub';
+import { handleCourseContentPage } from './modules/pages/udemy';
 
 window.addEventListener('load', () => {
   console.log('--------------------Document loaded');
@@ -69,5 +70,7 @@ if (crawlerOn) {
     setTimeout(handleChapterPageTruyenfull, 2000);
   } else if (href.includes('webnovelpub.pro') && href.includes('/chapter-')) {
     setTimeout(handleChapterPageWebnovelpub, 2000);
+  } else if (href.includes('udemy.com/course/') && href.includes('/lecture')) {
+    setTimeout(handleCourseContentPage, 4000);
   }
 }

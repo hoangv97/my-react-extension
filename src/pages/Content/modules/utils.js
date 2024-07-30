@@ -37,3 +37,27 @@ export const convertDateString = (input) => {
   // Format as 'YYYY-MM-DD'
   return `${year}-${month}-${day}`;
 };
+
+export const getTextContentWithSpaces = (element) => {
+  const ignoredTags = ['NOSCRIPT', 'SCRIPT', 'STYLE', 'LINK', 'META'];
+
+  let text = '';
+  element.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent;
+    } else if (
+      node.nodeType === Node.ELEMENT_NODE &&
+      !ignoredTags.includes(node.nodeName)
+    ) {
+      text += ' ' + getTextContentWithSpaces(node);
+    }
+  });
+
+  return text.trim();
+};
+
+export const getPageContent = async (selector) => {
+  return Array.from(document.querySelectorAll(selector)).map(
+    getTextContentWithSpaces
+  );
+};
