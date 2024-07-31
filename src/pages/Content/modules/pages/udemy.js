@@ -7,7 +7,7 @@ import {
 import { generateContent } from '../summarizer';
 import { getTextContentWithSpaces, sleep } from '../utils';
 
-const databaseId = '3dd58259e5bb4379bd9c48fc8781bcc9';
+const databaseId = '41e58c15320a45a1b59e5b6430ae3894';
 
 const autoNextPage = true;
 
