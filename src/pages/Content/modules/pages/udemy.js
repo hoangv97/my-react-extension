@@ -114,6 +114,11 @@ export const handleCourseContentPage = async (
 ) => {
   const courseUrl = window.location.href.split('/learn')[0];
 
+  const playBtn = document.querySelector('button[data-purpose="play-button"]');
+  if (playBtn) {
+    playBtn.click();
+  }
+
   // get the course title
   const courseTitle = document.querySelector(
     'h1[data-purpose="course-header-title"]'
@@ -160,6 +165,8 @@ export const handleCourseContentPage = async (
       pageId = page.id;
     } else {
       pageId = results[0].id;
+      console.log('Found course page:', pageId);
+      // return;
     }
   }
 

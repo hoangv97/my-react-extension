@@ -66,11 +66,14 @@ if (crawlerOn) {
     href.includes('goodreads.com/en/book/show')
   ) {
     setTimeout(handleBookShowPage, 2000);
-  } else if (href.includes('truyenfull.vn') && href.includes('chuong-')) {
+  } else if (
+    (href.includes('truyenfull.vn') || href.includes('truyenfull.io')) &&
+    href.includes('chuong-')
+  ) {
     setTimeout(handleChapterPageTruyenfull, 2000);
   } else if (href.includes('webnovelpub.pro') && href.includes('/chapter-')) {
     setTimeout(handleChapterPageWebnovelpub, 2000);
   } else if (href.includes('udemy.com/course/') && href.includes('/lecture')) {
-    setTimeout(handleCourseContentPage, 4000);
+    setTimeout(handleCourseContentPage, 8000);
   }
 }
