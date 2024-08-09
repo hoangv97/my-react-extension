@@ -114,9 +114,11 @@ export const handleCourseContentPage = async (
 ) => {
   const courseUrl = window.location.href.split('/learn')[0];
 
-  const playBtn = document.querySelector('button[data-purpose="play-button"]');
-  if (playBtn) {
-    playBtn.click();
+  const pauseBtn = document.querySelector(
+    'button[data-purpose="pause-button"]'
+  );
+  if (pauseBtn) {
+    pauseBtn.click();
   }
 
   // get the course title
